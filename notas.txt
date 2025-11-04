@@ -1,0 +1,51 @@
+KPIS del reporte: 
+
+# tarjetas:
+- mas barato
+- mediana
+- mas caro
+- conteo de total de productos analizados
+
+
+# tabla con detalles del producto, precio, calificacion y su lista de opiniones (o el resumen de la IA), cantventas y todo lo del JSON
+
+# slicers
+- envio: gratis vs no gratis
+- vendidos: +100, +1000, +10000
+- calificacion: 
+- precio
+
+
+Prompt para la IA: 
+
+
+Genera una funcion que clasifique los productos segun su precio en categorias como "economico", "mediano", "caro" evaluando el valor 
+promedio de los productos. Los productos 10% por debajo del promedio son economicos y los 10% mayores al promedio son caros. 
+El resto queda etiquetado en mediano. Seria como hacer un "if precio_actual < avg(precio_actual) then "economico""
+
+Agrega un agente de IA que tome el titulo de los productos y extraiga la marca para clasificarlo. ---ya no necesito el agente de IA, debido que hay un campo con la etiqueta brand
+
+Ejemplo: 
+Titulo: "Auriculares Inalámbricos Xiaomi Redmi Buds 6 Active Tws Whit Color Blanco Luz Blanco"
+Marca: Xiami
+--------
+Titulo: "Auriculares In-ear Inalámbricos Motorola Moto Buds 270 Anc Color Negro cancela ruidos"
+Marca: Motorola
+
+Si no podes determinar la marca, clasificala como "Otro"
+
+"
+
+
+
+
+Realiza un dashboard con streamlit con el fin de presentar las siguientes metricas: 
+
+- Cards: min(precio), median(precio), max(precio), count(id)
+- Tabla con toda la informacion que esta en el JSON/Excel y barra de scroll para navegar x completo
+- Grafico de dispersion: Analizar correlacion entre precio y ventas. busca responder la pregunta de ¿a menor precio mas ventas?
+- Grafico de barras: Mostrar el precio promedo por calificacion general
+- Grafico de torta: Mostrar los mas vendidos por marca y el conteo para ver las mas populares
+- Slicers
+
+Notas: siempre que me refiero a precio, es a precio_actual. 
