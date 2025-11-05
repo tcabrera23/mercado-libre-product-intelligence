@@ -1,57 +1,3 @@
-KPIS del reporte: 
-
-# tarjetas:
-- mas barato
-- mediana
-- mas caro
-- conteo de total de productos analizados
-
-
-# tabla con detalles del producto, precio, calificacion y su lista de opiniones (o el resumen de la IA), cantventas y todo lo del JSON
-
-# slicers
-- envio: gratis vs no gratis
-- vendidos: +100, +1000, +10000
-- calificacion: 
-- precio
-
-
-Prompt para la IA: 
-
-
-Genera una funcion que clasifique los productos segun su precio en categorias como "economico", "mediano", "caro" evaluando el valor 
-promedio de los productos. Los productos 10% por debajo del promedio son economicos y los 10% mayores al promedio son caros. 
-El resto queda etiquetado en mediano. Seria como hacer un "if precio_actual < avg(precio_actual) then "economico""
-
-Agrega un agente de IA que tome el titulo de los productos y extraiga la marca para clasificarlo. ---ya no necesito el agente de IA, debido que hay un campo con la etiqueta brand
-
-Ejemplo: 
-Titulo: "Auriculares Inalámbricos Xiaomi Redmi Buds 6 Active Tws Whit Color Blanco Luz Blanco"
-Marca: Xiami
---------
-Titulo: "Auriculares In-ear Inalámbricos Motorola Moto Buds 270 Anc Color Negro cancela ruidos"
-Marca: Motorola
-
-Si no podes determinar la marca, clasificala como "Otro"
-
-"
-
-
-
-
-Realiza un dashboard con streamlit con el fin de presentar las siguientes metricas estilo power bi:
-
-
-- Cards: min(precio), median(precio), max(precio), count(id)
-- Tabla con toda la informacion que esta en el JSON/Excel y barra de scroll para navegar x completo
-- Grafico de dispersion: Analizar correlacion entre precio y ventas. busca responder la pregunta de ¿a menor precio mas ventas?
-- Grafico de barras: Mostrar el precio promedo por calificacion general
-- Grafico de torta: Mostrar los mas vendidos por marca y el conteo para ver las mas populares
-- Slicers a la derecha de la pantalla
-
-Notas: siempre que me refiero a precio, es a precio_actual. 
-
-agregarle ya un agente de ia en un chat widget para preguntarle o pedirle que analice x cosa!!! tipo agente sql pero agente pandas
 python buscar_productos_ml.py "tu producto"
 
 por lo que veo la referencia de envio gratis se encuentra en 
@@ -61,7 +7,6 @@ por lo que veo la referencia de envio gratis se encuentra en
          </span>
         </div>
 
-
 y la cantidad de vendidos en 
 <span class="poly-phrase-label">
           | +25 vendidos
@@ -70,17 +15,6 @@ y la calificacion general:
 <span class="poly-phrase-label">
           5.0
          </span>
-
-
-
-
-
-Implementa los siguientes cambios: 
-
-si el precio anterior es null entonces completa con el precio actual y entonces logicamente el descuento es 0% 
-si la calificacion es null entonces completa con 0.0
-si vendidos es null entonces completa con "Sin ventas"
-
 quiero que tambien modifiquemos el script de reseñas. dicho programa utiliza la info de los json de productos ya extraidos. el programa de analisis de reseñas
 debe generar otro json como el de "resenas_productos" pero en vez de tomar un top de opiniones, toma solo el texto que hay de "Resumen de opiniones generado por IA" 
 ese texto lo podes extraer con el siguiente contexto: 
@@ -88,11 +22,7 @@ ese texto lo podes extraer con el siguiente contexto:
 - el selector es: "#reviews_capability_v3 > div > section > div > div:nth-child(2) > div.ui-review-capability-filter > div.ui-review-capability-filter__comments > div.ui-review-capability__summary > div.ui-review-capability__summary__plain_text > p"
 
 y ademas filtra por los de calificacion 1 estrella. de esos si toma el top5 de opiniones y ponelas en el json como en "resenas_productos_20251031_194943.json"
-
-
 el objetivo del proyecto va ser primero recolectar los productos y luego entrando a los links de cada uno obtener las opiniones/reseñas de los mismos en formatos JSON
-
-
 Excelente esta nueva version. Para la V3 vamos a corregir un bug y agregar nuevos features
 
 Correccion necesaria: Obtener las reseñas de 1 estrella filtrando por alguno de estos
@@ -102,8 +32,5 @@ en mi opinion seria mejor el JS para filtrar de forma dinamica
 
 Tambien verifica que los tests funcionen
 
-# Nuevos features
-Export a Excel los JSON generados en el momento para que el usuario pueda leerlos en su computadora
-Nuevo script .py para visualizar dashboard con Streamlit y manejo de Pandas y librerias de visualizacion
 
 

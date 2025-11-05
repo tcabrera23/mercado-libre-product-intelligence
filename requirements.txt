@@ -13,3 +13,6 @@ openpyxl>=3.1.2
 streamlit>=1.28.0
 plotly>=5.17.0
 
+# Para Chatbot IA (v4.0)
+groq>=0.4.0
+

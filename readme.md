@@ -30,14 +30,20 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 - 📋 **Dos hojas**: Productos + Resumen con estadísticas
 - 📏 **Formato automático**: Anchos de columna ajustados
 
-### 📊 Dashboard Interactivo (dashboard_productos.py) ⭐ NUEVO v3.0
+### 📊 Dashboard Interactivo (dashboard_productos_v4.py) ⭐ NUEVO v4.0
 - 📊 **Cards de métricas**: Min, Median, Max precio, Total productos
-- 📋 **Tabla interactiva**: Con scroll, búsqueda y ordenamiento
+- 📋 **Tabla mejorada**: Con Resumen IA (join productos + análisis)
+- 🔢 **Sort inteligente**: Ordena correctamente Vendidos y Descuento
+- ⬇️ **Descarga Excel**: Formato .xlsx en lugar de CSV
 - 📈 **Gráfico dispersión**: Precio vs Ventas (correlación)
 - 📊 **Gráfico barras**: Precio promedio por calificación
 - 🥧 **Gráfico torta**: Marcas más populares (Top 10)
 - 🎚️ **Filtros dinámicos**: Marca, envío, categoría, calificación
-- ⬇️ **Descarga CSV**: Datos filtrados exportables
+- 🤖 **Chatbot IA**: Asistente con Groq + LLama-3.3-70b
+  - Análisis proactivo de datos
+  - Lenguaje marketinero
+  - Prompts sugeridos (Avatar Cliente, Estrategia Precio)
+  - Explicaciones de gráficos en tiempo real
 
 ## 🚀 Uso Rápido
 
