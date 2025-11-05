@@ -38,7 +38,7 @@ def obtener_html_mercadolibre(producto, solo_resultados=True):
     }
     # Nota: No incluimos Accept-Encoding para que requests lo maneje automáticamente
     
-    # Formatear el producto para la URL (reemplazar espacios con guiones)
+    # Formatear el producto para la URL (reemplazar espacios con guiones)celulares-samsung
     producto_formateado = urllib.parse.quote(producto.replace(' ', '-'))
     url = f"https://listado.mercadolibre.com.ar/{producto_formateado}"
     
@@ -88,7 +88,7 @@ def obtener_html_mercadolibre(producto, solo_resultados=True):
 # Ejemplo de uso
 if __name__ == "__main__":
     # Puedes cambiar el producto aquí
-    producto = "auriculares"
+    producto = "ipad"
     
     soup_completo, seccion_resultados = obtener_html_mercadolibre(producto, solo_resultados=True)
     
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         print("\n" + "="*80)
         print("HTML DE LA SECCIÓN DE RESULTADOS:")
         print("="*80)
-        print(seccion_resultados.prettify()[:2000])  # Mostrar solo los primeros 2000 caracteres
+        print(seccion_resultados.prettify()[:10000])  # Mostrar solo los primeros 2000 caracteres
         print("\n... (HTML truncado para visualización) ...")
     elif soup_completo:
         print("\n⚠️ No se pudo extraer la sección específica, pero se obtuvo el HTML completo")

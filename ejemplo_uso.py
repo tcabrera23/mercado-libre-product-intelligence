@@ -100,12 +100,12 @@ def ejemplo_analisis_precios():
 
 
 # ============================================================================
-# EJEMPLO 4: Filtrar productos con descuento
+# EJEMPLO 4: Filtrar productos con descuento y envío gratis
 # ============================================================================
 def ejemplo_filtrar_descuentos():
-    """Encontrar solo productos con descuento"""
+    """Encontrar solo productos con descuento y envío gratis"""
     print("\n" + "="*80)
-    print("EJEMPLO 4: Productos con Descuento")
+    print("EJEMPLO 4: Productos con Descuento y Envío Gratis")
     print("="*80)
     
     productos = buscar_producto_mercadolibre("auriculares")
@@ -117,14 +117,24 @@ def ejemplo_filtrar_descuentos():
     # Filtrar productos con descuento
     con_descuento = [p for p in productos if p['descuento']]
     
-    print(f"\n🎉 Productos con descuento: {len(con_descuento)}/{len(productos)}")
+    # Filtrar productos con envío gratis
+    con_envio_gratis = [p for p in productos if p['envio_gratis']]
     
-    # Mostrar los 5 mejores descuentos
-    print("\n🏆 Top 5 descuentos:")
-    for i, prod in enumerate(con_descuento[:5], 1):
+    # Filtrar productos con ambos
+    combo = [p for p in productos if p['descuento'] and p['envio_gratis']]
+    
+    print(f"\n📊 Resultados:")
+    print(f"   🎉 Con descuento: {len(con_descuento)}/{len(productos)}")
+    print(f"   🚚 Con envío gratis: {len(con_envio_gratis)}/{len(productos)}")
+    print(f"   ✨ Con ambos: {len(combo)}/{len(productos)}")
+    
+    # Mostrar los 5 mejores descuentos con envío gratis
+    print("\n🏆 Top 5 ofertas (descuento + envío gratis):")
+    for i, prod in enumerate(combo[:5], 1):
         print(f"\n{i}. {prod['titulo'][:60]}...")
         print(f"   💰 {prod['precio_actual']} (antes: {prod['precio_anterior']})")
         print(f"   🎯 {prod['descuento']}")
+        print(f"   🚚 Envío gratis: ✅")
 
 
 # ============================================================================
@@ -145,12 +155,8 @@ def ejemplo_mejor_calificacion():
     # Filtrar productos con calificación
     productos_calificados = []
     for p in productos:
-        if p['calificacion'] != "No disponible":
-            try:
-                rating = float(p['calificacion'])
-                productos_calificados.append((rating, p))
-            except:
-                continue
+        if p['calificacion'] is not None:
+            productos_calificados.append((p['calificacion'], p))
     
     # Ordenar por calificación (mayor a menor)
     productos_calificados.sort(reverse=True, key=lambda x: x[0])
@@ -187,8 +193,12 @@ def ejemplo_uso_avanzado():
         print(f"   Total de productos: {len(productos)}")
         
         # Ejemplo: contar cuántos tienen envío gratis
-        envio_gratis = sum(1 for p in productos if 'gratis' in p['envio'].lower())
+        envio_gratis = sum(1 for p in productos if p['envio_gratis'])
         print(f"   Con envío gratis: {envio_gratis}")
+        
+        # Productos mejor calificados
+        con_calificacion = sum(1 for p in productos if p['calificacion'] is not None)
+        print(f"   Con calificación: {con_calificacion}")
         
         # Guardar con nombre personalizado
         archivo = guardar_productos(productos, "notebook_custom")
@@ -219,8 +229,8 @@ def ejemplo_comparacion_precio_calidad():
             precio = int(precio_str)
             
             # Extraer calificación
-            if p['calificacion'] != "No disponible":
-                rating = float(p['calificacion'])
+            if p['calificacion'] is not None:
+                rating = p['calificacion']
                 
                 # Score simple: rating / (precio / 10000)
                 # Productos más baratos con mejor rating tendrán score más alto

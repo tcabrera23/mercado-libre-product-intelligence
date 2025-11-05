@@ -63,16 +63,16 @@ Crear un sistema **dinámico y reutilizable** para extraer información de produ
 ### Campos Extraídos por Producto
 ```python
 {
-    "id": "único",
-    "titulo": "Nombre completo",
-    "link": "URL directa",
-    "precio_actual": "$25.109",
-    "precio_anterior": "$34.375",
-    "descuento": "26% OFF",
-    "calificacion": "4.5",
-    "vendidos": "+1000 vendidos",
-    "imagen": "URL imagen",
-    "envio": "Envío gratis"
+    "id": "único",                      # String - ID único del producto
+    "titulo": "Nombre completo",        # String - Título del producto
+    "link": "URL directa",              # String - URL del producto
+    "precio_actual": "$25.109",         # String - Precio formateado
+    "precio_anterior": "$34.375",       # String - Precio anterior (si hay descuento)
+    "descuento": "26% OFF",             # String - Porcentaje de descuento
+    "calificacion": 4.5,                # Float - Calificación (1.0-5.0) o None
+    "vendidos": "+1000 vendidos",       # String - Cantidad de ventas
+    "imagen": "URL imagen",             # String - URL de la imagen
+    "envio_gratis": true                # Boolean - True si tiene envío gratis
 }
 ```
 

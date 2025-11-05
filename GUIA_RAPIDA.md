@@ -63,10 +63,10 @@ python ejemplo_uso.py
       "precio_actual": "$25.109",
       "precio_anterior": "$34.375",
       "descuento": "26% OFF",
-      "calificacion": "4.5",
+      "calificacion": 4.5,
       "vendidos": "+1000 vendidos",
       "imagen": "https://...",
-      "envio": "Envío gratis"
+      "envio_gratis": true
     }
   ]
 }
@@ -234,7 +234,7 @@ Después de extraer los datos, puedes:
 
 4. **Análisis de Sentimientos**
    - Usar `get_resenias.py` para extraer opiniones
-   - Analizar con IA (OpenAI, Anthropic, etc.)
+   - Analizar con IA (OpenAI, Anthropic, etc.) y obtener el Avatar del Cliente Ideal
 
 5. **Automatización**
    - Crear un script que se ejecute diariamente

@@ -49,3 +49,23 @@ Realiza un dashboard con streamlit con el fin de presentar las siguientes metric
 - Slicers
 
 Notas: siempre que me refiero a precio, es a precio_actual. 
+
+agregarle ya un agente de ia en un chat widget para preguntarle o pedirle que analice x cosa!!! tipo agente sql pero agente pandas
+python buscar_productos_ml.py "tu producto"
+
+por lo que veo la referencia de envio gratis se encuentra en 
+ <div class="poly-component__shipping">
+         <span class="poly-shipping--next_day">
+          Llega gratis mañana
+         </span>
+        </div>
+
+
+y la cantidad de vendidos en 
+<span class="poly-phrase-label">
+          | +25 vendidos
+         </span>
+y la calificacion general: 
+<span class="poly-phrase-label">
+          5.0
+         </span>
