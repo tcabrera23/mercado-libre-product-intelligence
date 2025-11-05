@@ -8,21 +8,36 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 
 ## ✨ Características
 
-### Extracción de Productos (buscar_productos_ml.py)
+### 🎯 Extracción de Productos (buscar_productos_ml.py)
 - 🔍 **Búsqueda dinámica**: Busca cualquier producto en Mercado Libre Argentina
 - 🤖 **Anti-scraping bypass**: Headers configurados para evitar bloqueos
 - 📊 **Extracción completa**: Precios, descuentos, calificaciones, envíos, imágenes
 - ✅ **Campos siempre completos**: Valores por defecto para campos null (v2.0)
-- 💾 **Export a JSON**: Guarda los resultados con timestamp para análisis posterior
+- 💾 **Export a JSON**: Guarda los resultados con timestamp
 - 🎯 **ID único**: Cada producto recibe un identificador único
-- 📝 **Resumen visual**: Muestra los primeros productos encontrados en consola
 
-### Análisis de Reseñas (analizar_resenias_ia.py) ⭐ NUEVO v2.0
-- 🤖 **Resumen de IA**: Extrae el resumen generado por IA de Mercado Libre
-- ⭐ **Opiniones negativas**: Top 5 de reseñas con 1 estrella
-- 📊 **Análisis completo**: Identifica problemas comunes en productos
-- 🎯 **Avatar del cliente**: Datos para crear perfil de cliente ideal
-- 💾 **JSON estructurado**: Formato listo para análisis avanzado
+### 🤖 Análisis de Reseñas (analizar_resenias_ia_v2.py) ⭐ NUEVO v3.0
+- 🌐 **Selenium**: Filtrado dinámico con interacción real
+- 🎯 **Filtro automático**: Click en opiniones de 1 estrella
+- 🤖 **Resumen de IA**: Extrae el resumen generado por IA de ML
+- ⭐ **Top 5 negativas**: Reseñas de 1 estrella filtradas
+- 💾 **JSON estructurado**: Listo para análisis
+
+### 📊 Export a Excel (export_to_excel.py) ⭐ NUEVO v3.0
+- 📁 **Conversión automática**: JSON → Excel (.xlsx)
+- 🏷️ **Clasificación de precios**: Económico/Mediano/Caro
+- 🏢 **Extracción de marcas**: Del título del producto
+- 📋 **Dos hojas**: Productos + Resumen con estadísticas
+- 📏 **Formato automático**: Anchos de columna ajustados
+
+### 📊 Dashboard Interactivo (dashboard_productos.py) ⭐ NUEVO v3.0
+- 📊 **Cards de métricas**: Min, Median, Max precio, Total productos
+- 📋 **Tabla interactiva**: Con scroll, búsqueda y ordenamiento
+- 📈 **Gráfico dispersión**: Precio vs Ventas (correlación)
+- 📊 **Gráfico barras**: Precio promedio por calificación
+- 🥧 **Gráfico torta**: Marcas más populares (Top 10)
+- 🎚️ **Filtros dinámicos**: Marca, envío, categoría, calificación
+- ⬇️ **Descarga CSV**: Datos filtrados exportables
 
 ## 🚀 Uso Rápido
 
