@@ -69,3 +69,24 @@ y la calificacion general:
 <span class="poly-phrase-label">
           5.0
          </span>
+
+
+
+
+
+Implementa los siguientes cambios: 
+
+si el precio anterior es null entonces completa con el precio actual y entonces logicamente el descuento es 0% 
+si la calificacion es null entonces completa con 0.0
+si vendidos es null entonces completa con "Sin ventas"
+
+quiero que tambien modifiquemos el script de reseñas. dicho programa utiliza la info de los json de productos ya extraidos. el programa de analisis de reseñas
+debe generar otro json como el de "resenas_productos" pero en vez de tomar un top de opiniones, toma solo el texto que hay de "Resumen de opiniones generado por IA" 
+ese texto lo podes extraer con el siguiente contexto: 
+- el xpath es: "//*[@id="reviews_capability_v3"]/div/section/div/div[2]/div[2]/div[2]/div[1]/div[1]/p"
+- el selector es: "#reviews_capability_v3 > div > section > div > div:nth-child(2) > div.ui-review-capability-filter > div.ui-review-capability-filter__comments > div.ui-review-capability__summary > div.ui-review-capability__summary__plain_text > p"
+
+y ademas filtra por los de calificacion 1 estrella. de esos si toma el top5 de opiniones y ponelas en el json como en "resenas_productos_20251031_194943.json"
+
+
+el objetivo del proyecto va ser primero recolectar los productos y luego entrando a los links de cada uno obtener las opiniones/reseñas de los mismos en formatos JSON

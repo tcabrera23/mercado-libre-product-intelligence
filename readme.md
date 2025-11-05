@@ -8,14 +8,35 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 
 ## ✨ Características
 
+### Extracción de Productos (buscar_productos_ml.py)
 - 🔍 **Búsqueda dinámica**: Busca cualquier producto en Mercado Libre Argentina
 - 🤖 **Anti-scraping bypass**: Headers configurados para evitar bloqueos
 - 📊 **Extracción completa**: Precios, descuentos, calificaciones, envíos, imágenes
+- ✅ **Campos siempre completos**: Valores por defecto para campos null (v2.0)
 - 💾 **Export a JSON**: Guarda los resultados con timestamp para análisis posterior
 - 🎯 **ID único**: Cada producto recibe un identificador único
 - 📝 **Resumen visual**: Muestra los primeros productos encontrados en consola
 
+### Análisis de Reseñas (analizar_resenias_ia.py) ⭐ NUEVO v2.0
+- 🤖 **Resumen de IA**: Extrae el resumen generado por IA de Mercado Libre
+- ⭐ **Opiniones negativas**: Top 5 de reseñas con 1 estrella
+- 📊 **Análisis completo**: Identifica problemas comunes en productos
+- 🎯 **Avatar del cliente**: Datos para crear perfil de cliente ideal
+- 💾 **JSON estructurado**: Formato listo para análisis avanzado
+
 ## 🚀 Uso Rápido
+
+### 🎯 Demo v2.0 - Flujo Completo
+
+```bash
+# Paso 1: Extraer productos
+python buscar_productos_ml.py "auriculares bluetooth"
+
+# Paso 2: Analizar reseñas con IA
+python analizar_resenias_ia.py productos_auriculares_bluetooth_*.json
+```
+
+**Ver [DEMO_V2.0.md](DEMO_V2.0.md) para guía completa** ⭐
 
 ### Opción 1: Modo Interactivo
 
@@ -38,17 +59,28 @@ python buscar_productos_ml.py "notebook gaming"
 ```
 Analisis de Productos/
 │
-├── buscar_productos_ml.py      # 🎯 Script principal (USAR ESTE)
-├── get_html.py                  # Función para obtener HTML de ML
-├── get_products.py              # Script original (legacy)
-├── get_resenias.py              # Extracción de reseñas
-├── productos_con_id.json        # Ejemplo de productos extraídos
-├── resenas_productos_*.json     # Ejemplo de reseñas extraídas
+├── 🎯 Scripts Principales
+│   ├── buscar_productos_ml.py      # ⭐ Extracción de productos
+│   └── analizar_resenias_ia.py     # ⭐ Análisis de reseñas (NUEVO v2.0)
 │
-└── backup/                      # Versiones anteriores
-    ├── deepseek_v1.py
-    ├── deepseek_V2.py
-    └── productos*.json
+├── 🔧 Funciones y Utilidades
+│   ├── get_html.py                 # Función para obtener HTML de ML
+│   └── ejemplo_uso.py              # Ejemplos avanzados
+│
+├── 📚 Documentación
+│   ├── README.md                   # Este archivo
+│   ├── DEMO_V2.0.md               # ⭐ Guía completa v2.0
+│   ├── GUIA_RAPIDA.md             # Tutorial rápido
+│   ├── INICIO.md                   # Punto de entrada
+│   └── CHANGELOG.md                # Historial de cambios
+│
+├── 📄 Datos Generados
+│   ├── productos_*.json            # Productos extraídos
+│   └── analisis_resenias_*.json   # Análisis de reseñas (NUEVO)
+│
+└── 💾 Backup
+    ├── get_products.py             # Script original (legacy)
+    └── get_resenias.py             # Versión anterior
 ```
 
 ## 🛠️ Instalación
@@ -84,10 +116,10 @@ El programa genera un archivo JSON con el siguiente formato:
       "precio_actual": "$42.000",
       "precio_anterior": "$50.000",
       "descuento": "16% OFF",
-      "calificacion": "4.4",
+      "calificacion": 4.4,
       "vendidos": "+1000 vendidos",
       "imagen": "https://...",
-      "envio": "Envío gratis"
+      "envio_gratis": true
     }
   ]
 }

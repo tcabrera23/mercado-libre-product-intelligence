@@ -74,6 +74,11 @@ def extraer_productos_con_id(html_section):
             discount_element = item.find('span', class_='poly-price__disc_label')
             descuento = discount_element.text.strip() if discount_element else ""
             
+            # Si no hay precio anterior, usar el precio actual y descuento 0%
+            if not precio_anterior and precio != "No disponible":
+                precio_anterior = precio
+                descuento = "0%"
+            
             # Envío gratis (convertir a boolean)
             shipping_div = item.find('div', class_='poly-component__shipping')
             envio_gratis = False
@@ -83,7 +88,7 @@ def extraer_productos_con_id(html_section):
             
             # Calificación y vendidos (ambos están en span.poly-phrase-label)
             calificacion = None
-            vendidos = "No disponible"
+            vendidos = None
             
             # Buscar todos los elementos poly-phrase-label
             phrase_labels = item.find_all('span', class_='poly-phrase-label')
@@ -102,6 +107,13 @@ def extraer_productos_con_id(html_section):
                         calificacion = rating_value
                     except ValueError:
                         continue
+            
+            # Completar campos null con valores por defecto
+            if calificacion is None:
+                calificacion = 0.0
+            
+            if vendidos is None:
+                vendidos = "Sin ventas"
             
             # Imagen
             img_element = item.find('img')
@@ -195,7 +207,7 @@ def mostrar_resumen_productos(productos, limite=5):
         print()
         
         # Mostrar calificación y vendidos
-        calificacion_str = f"{prod['calificacion']}" if prod['calificacion'] else "Sin calificación"
+        calificacion_str = f"{prod['calificacion']}" if prod['calificacion'] and prod['calificacion'] > 0 else "Sin calificación"
         print(f"   ⭐ {calificacion_str} | {prod['vendidos']}")
         
         # Mostrar envío gratis
