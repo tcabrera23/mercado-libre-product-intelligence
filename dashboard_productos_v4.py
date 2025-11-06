@@ -34,26 +34,52 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 2rem;
     }
-    .chat-widget {
+    
+    /* Chat Widget Styles */
+    .chat-widget-button {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        z-index: 999;
-    }
-    .chat-button {
         width: 60px;
         height: 60px;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 24px;
+        z-index: 999;
+        transition: transform 0.3s ease;
     }
+    
+    .chat-widget-button:hover {
+        transform: scale(1.1);
+    }
+    
+    .chat-widget-container {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 400px;
+        max-height: 600px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        z-index: 998;
+        overflow: hidden;
+    }
+    
+    .chat-widget-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
     .stChatFloatingInputContainer {
         bottom: 90px;
     }
@@ -130,9 +156,9 @@ def cargar_datos(archivo_json_productos, archivo_json_analisis=None):
     """Carga y procesa los datos del JSON, con join opcional de análisis"""
     # Cargar productos
     with open(archivo_json_productos, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+        data_productos = json.load(f)
     
-    productos = data.get('productos', [])
+    productos = data_productos.get('productos', [])
     df = pd.DataFrame(productos)
     
     # Procesar datos básicos
@@ -152,24 +178,36 @@ def cargar_datos(archivo_json_productos, archivo_json_analisis=None):
     df['categoria_precio'] = df['precio_numerico'].apply(lambda x: clasificar_precio(x, promedio))
     
     # JOIN con análisis de reseñas si existe
-    df['resumen_ia'] = None
+    data_analisis_completo = None
     if archivo_json_analisis and os.path.exists(archivo_json_analisis):
         try:
             with open(archivo_json_analisis, 'r', encoding='utf-8') as f:
-                data_analisis = json.load(f)
+                data_analisis_completo = json.load(f)
             
-            df_analisis = pd.DataFrame(data_analisis.get('productos', []))
+            df_analisis = pd.DataFrame(data_analisis_completo.get('productos', []))
             if not df_analisis.empty and 'producto_id' in df_analisis.columns:
-                # Join por producto_id
+                # JOIN por 'id' (productos) con 'producto_id' (análisis)
                 df = df.merge(
                     df_analisis[['producto_id', 'resumen_ia', 'opiniones_1_estrella']],
-                    on='producto_id',
+                    left_on='id',
+                    right_on='producto_id',
                     how='left'
                 )
+                # Eliminar columna duplicada producto_id
+                if 'producto_id' in df.columns:
+                    df = df.drop(columns=['producto_id'])
         except Exception as e:
             st.warning(f"No se pudo cargar análisis de reseñas: {e}")
     
-    return df, data.get('producto_buscado', 'Productos')
+    # Si no hay resumen_ia (no se hizo merge o no matcheó), crear columna con None
+    if 'resumen_ia' not in df.columns:
+        df['resumen_ia'] = None
+    
+    # Rellenar NaN en resumen_ia con texto descriptivo
+    df['resumen_ia'] = df['resumen_ia'].fillna("Sin análisis disponible")
+    
+    # Retornar también los JSONs completos para el agente de IA
+    return df, data_productos.get('producto_buscado', 'Productos'), data_productos, data_analisis_completo
 
 
 def crear_excel_descargable(df_mostrar):
@@ -193,8 +231,64 @@ def crear_excel_descargable(df_mostrar):
     return output
 
 
-def analizar_con_ia(prompt, df, groq_client):
-    """Analiza datos usando Groq AI"""
+def ejecutar_scraping_producto(producto_nombre):
+    """Ejecuta el scraping de productos usando buscar_productos_ml.py"""
+    import subprocess
+    try:
+        # Ejecutar script de búsqueda de productos
+        result = subprocess.run(
+            ['python', 'buscar_productos_ml.py', producto_nombre],
+            capture_output=True,
+            text=True,
+            timeout=120  # 2 minutos timeout
+        )
+        
+        if result.returncode == 0:
+            # Buscar el archivo JSON generado más reciente
+            archivos = [f for f in os.listdir('.') if f.startswith('productos_') and producto_nombre.replace(' ', '_') in f and f.endswith('.json')]
+            if archivos:
+                archivos.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                return True, archivos[0], "Productos extraídos exitosamente"
+            else:
+                return False, None, "No se generó el archivo JSON"
+        else:
+            return False, None, f"Error en scraping: {result.stderr}"
+    except subprocess.TimeoutExpired:
+        return False, None, "Timeout: El scraping tomó demasiado tiempo"
+    except Exception as e:
+        return False, None, f"Error inesperado: {str(e)}"
+
+
+def ejecutar_analisis_resenias(archivo_productos):
+    """Ejecuta el análisis de reseñas usando analizar_resenias_ia.py"""
+    import subprocess
+    try:
+        # Ejecutar script de análisis de reseñas
+        result = subprocess.run(
+            ['python', 'analizar_resenias_ia.py', archivo_productos],
+            capture_output=True,
+            text=True,
+            timeout=600  # 10 minutos timeout (puede ser largo)
+        )
+        
+        if result.returncode == 0:
+            # Buscar el archivo JSON de análisis generado más reciente
+            archivos = [f for f in os.listdir('.') if f.startswith('analisis_resenias_') and f.endswith('.json')]
+            if archivos:
+                archivos.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                return True, archivos[0], "Análisis de reseñas completado"
+            else:
+                return False, None, "No se generó el archivo de análisis"
+        else:
+            return False, None, f"Error en análisis: {result.stderr}"
+    except subprocess.TimeoutExpired:
+        return False, None, "Timeout: El análisis tomó demasiado tiempo (>10 min)"
+    except Exception as e:
+        return False, None, f"Error inesperado: {str(e)}"
+
+
+def analizar_con_ia(prompt, df, groq_client, json_productos=None, json_analisis=None):
+    """Analiza datos usando Groq AI con acceso a JSONs completos"""
     try:
         # Preparar contexto con estadísticas
         stats = f"""
@@ -211,29 +305,44 @@ Datos del Dashboard:
         # Agregar información de reseñas si existe
         if 'resumen_ia' in df.columns and df['resumen_ia'].notna().any():
             resumenes = df[df['resumen_ia'].notna()]['resumen_ia'].head(3).tolist()
-            stats += f"\n\nResúmenes de IA de ML:\n" + "\n".join([f"- {r[:200]}..." for r in resumenes if r])
+            stats += f"\n\nEjemplos de Resúmenes de IA de ML:\n" + "\n".join([f"- {r[:200]}..." for r in resumenes if r])
+        
+        # Agregar contexto de JSONs completos si están disponibles
+        contexto_json = ""
+        if json_productos:
+            # Incluir algunos productos de ejemplo
+            productos_sample = json_productos.get('productos', [])[:5]
+            contexto_json += f"\n\nEjemplo de estructura de productos (primeros 5 de {len(json_productos.get('productos', []))}):\n"
+            contexto_json += json.dumps(productos_sample, ensure_ascii=False, indent=2)[:2000]
+        
+        if json_analisis:
+            # Incluir análisis completos disponibles
+            analisis_sample = json_analisis.get('productos', [])[:3]
+            contexto_json += f"\n\nEjemplo de análisis con opiniones (primeros 3 de {json_analisis.get('total_con_resumen_ia', 0)} con resumen):\n"
+            contexto_json += json.dumps(analisis_sample, ensure_ascii=False, indent=2)[:2000]
         
         system_prompt = """Eres un Data Analyst experto especializado en e-commerce y análisis de mercado.
 Analizas datos de productos de Mercado Libre con un enfoque marketinero y práctico.
 Tus análisis son concisos, accionables y orientados a resultados de negocio.
-Usas pandas para manipular datos cuando es necesario.
-Cuando explicas gráficos, lo haces en lenguaje simple y orientado a decisiones."""
+Tienes acceso completo a los datos de productos y reseñas de clientes.
+Cuando te preguntan sobre opiniones, puedes hacer referencia a los resúmenes generados por IA y las opiniones negativas (1 estrella).
+Cuando explicas insights, lo haces en lenguaje simple, con bullet points y orientado a decisiones de negocio."""
 
         # Llamar a Groq API
         chat_completion = groq_client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"{stats}\n\nPregunta del usuario: {prompt}"}
+                {"role": "user", "content": f"{stats}{contexto_json}\n\nPregunta del usuario: {prompt}"}
             ],
-            model="llama-3.3-70b-versatile",  # o "mixtral-8x7b-32768"
+            model="llama-3.3-70b-versatile",
             temperature=0.7,
-            max_tokens=1000
+            max_tokens=1500
         )
         
         return chat_completion.choices[0].message.content
     
     except Exception as e:
-        return f"Error al procesar con IA: {str(e)}"
+        return f"❌ Error al procesar con IA: {str(e)}"
 
 
 def main():
@@ -251,6 +360,54 @@ def main():
     
     # Sidebar - Cargar archivo
     st.sidebar.title("📁 Configuración")
+    
+    # === BARRA DE BÚSQUEDA EN TIEMPO REAL ===
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🔍 Búsqueda en Tiempo Real")
+    st.sidebar.caption("Busca un producto y obtén datos + reseñas")
+    
+    # Input de búsqueda
+    with st.sidebar.form(key="search_form", clear_on_submit=False):
+        producto_buscar = st.text_input(
+            "Nombre del producto:",
+            placeholder="ej: auriculares bluetooth",
+            help="Escribe el nombre del producto a buscar en Mercado Libre"
+        )
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            buscar_productos_btn = st.form_submit_button("🔍 Buscar", use_container_width=True)
+        with col2:
+            analizar_resenias_checkbox = st.checkbox("Incluir reseñas", value=True, help="Analizar reseñas (toma más tiempo)")
+    
+    # Procesar búsqueda
+    if buscar_productos_btn and producto_buscar:
+        with st.sidebar:
+            with st.spinner(f"🔍 Buscando '{producto_buscar}'..."):
+                # Paso 1: Scraping de productos
+                exito_productos, archivo_productos_nuevo, mensaje_productos = ejecutar_scraping_producto(producto_buscar)
+                
+                if exito_productos:
+                    st.success(f"✅ {mensaje_productos}")
+                    st.info(f"📄 Archivo: {archivo_productos_nuevo}")
+                    
+                    # Paso 2: Análisis de reseñas (si está marcado)
+                    if analizar_resenias_checkbox:
+                        with st.spinner(f"🤖 Analizando reseñas... (puede tomar 5-10 min)"):
+                            exito_analisis, archivo_analisis_nuevo, mensaje_analisis = ejecutar_analisis_resenias(archivo_productos_nuevo)
+                            
+                            if exito_analisis:
+                                st.success(f"✅ {mensaje_analisis}")
+                                st.info(f"📄 Archivo: {archivo_analisis_nuevo}")
+                            else:
+                                st.warning(f"⚠️ {mensaje_analisis}")
+                    
+                    st.success("🎉 ¡Búsqueda completada! Recarga la página o selecciona los nuevos archivos abajo.")
+                    st.button("🔄 Recargar Dashboard", on_click=lambda: st.rerun())
+                else:
+                    st.error(f"❌ {mensaje_productos}")
+    
+    st.sidebar.markdown("---")
     
     # Listar archivos JSON disponibles
     archivos_productos = [f for f in os.listdir('.') if f.startswith('productos_') and f.endswith('.json')]
@@ -278,9 +435,9 @@ def main():
                 index=0
             )
     
-    # Cargar datos
+    # Cargar datos (ahora retorna 4 valores: df, nombre_producto, json_productos, json_analisis)
     try:
-        df, producto_buscado = cargar_datos(archivo_productos, archivo_analisis)
+        df, producto_buscado, json_productos_completo, json_analisis_completo = cargar_datos(archivo_productos, archivo_analisis)
     except Exception as e:
         st.error(f"❌ Error al cargar: {e}")
         return
@@ -448,9 +605,9 @@ def main():
     st.markdown("### 📋 Tabla de Productos")
     st.caption(f"Total: {len(df_filtrado)} productos")
     
-    # Columnas a mostrar
+    # Columnas a mostrar (ahora incluye 'link')
     columnas_base = ['titulo', 'marca', 'precio_actual', 'categoria_precio',
-                     'calificacion', 'vendidos', 'envio_gratis_texto', 'descuento_mostrar']
+                     'calificacion', 'vendidos', 'envio_gratis_texto', 'descuento_mostrar', 'link']
     
     if 'resumen_ia' in df_filtrado.columns:
         columnas_base.insert(4, 'resumen_ia')
@@ -466,7 +623,8 @@ def main():
         'calificacion': 'Calificación',
         'vendidos': 'Vendidos',
         'envio_gratis_texto': 'Envío Gratis',
-        'descuento_mostrar': 'Descuento'
+        'descuento_mostrar': 'Descuento',
+        'link': 'Link'
     }
     
     if 'resumen_ia' in df_mostrar.columns:
@@ -474,13 +632,25 @@ def main():
     
     df_mostrar = df_mostrar.rename(columns=nombres_columnas)
     
-    # Agregar columnas numéricas ocultas para ordenamiento
-    df_display = df_mostrar.copy()
-    df_display['_vendidos_num'] = df_filtrado['cantidad_vendidos_num'].values
-    df_display['_descuento_num'] = df_filtrado['descuento_num'].values
+    # Convertir columnas a tipos numéricos para filtrado dinámico
+    # Columna Precio: Extraer valor numérico
+    df_mostrar['Precio_num'] = df_filtrado['precio_numerico'].values
     
-    # Configurar columna config para sort
+    # Columna Descuento: Extraer valor numérico entero
+    df_mostrar['Descuento_num'] = df_filtrado['descuento_num'].values.astype(int)
+    
+    # Configurar columna config para sort, tipos y link clickeable
     column_config = {
+        "Precio": st.column_config.NumberColumn(
+            "Precio",
+            help="Precio actual del producto",
+            format="$%.0f"
+        ),
+        "Precio_num": st.column_config.NumberColumn(
+            "Precio (num)",
+            help="Precio numérico para filtrado",
+            format="$%.2f"
+        ),
         "Vendidos": st.column_config.TextColumn(
             "Vendidos",
             help="Cantidad de productos vendidos"
@@ -488,6 +658,21 @@ def main():
         "Descuento": st.column_config.TextColumn(
             "Descuento",
             help="Porcentaje de descuento"
+        ),
+        "Descuento_num": st.column_config.NumberColumn(
+            "Descuento (%)",
+            help="Descuento numérico para filtrado",
+            format="%d%%"
+        ),
+        "Link": st.column_config.LinkColumn(
+            "Link",
+            help="Link al producto en Mercado Libre",
+            display_text="Ver Producto 🔗"
+        ),
+        "Resumen IA": st.column_config.TextColumn(
+            "Resumen IA",
+            help="Resumen generado por IA de Mercado Libre",
+            width="large"
         ),
     }
     
@@ -509,63 +694,95 @@ def main():
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
     
-    # CHATBOT IA
+    # CHATBOT IA - Widget Flotante
+    # Inicializar estado del chat
+    if "chat_abierto" not in st.session_state:
+        st.session_state.chat_abierto = False
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    # Crear el widget flotante usando popover (nativo de Streamlit)
     if groq_client:
-        st.markdown("---")
-        st.markdown("### 🤖 Asistente IA - Data Analyst")
-        
-        # Prompts sugeridos
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            if st.button("💡 Avatar de Cliente Ideal"):
-                st.session_state.prompt_sugerido = "Analiza todas las opiniones para crear un avatar de cliente ideal"
-        
-        with col2:
-            if st.button("💰 Estrategia de Precio"):
-                st.session_state.prompt_sugerido = "Sugerime una estrategia para encontrar el mejor precio de venta del producto analizado"
-        
-        with col3:
-            if st.button("📊 Explica los Datos"):
-                st.session_state.prompt_sugerido = "Que me podes explicar de estos datos?"
-        
-        # Chat interface
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-        
-        if "prompt_sugerido" in st.session_state:
-            prompt = st.session_state.prompt_sugerido
-            del st.session_state.prompt_sugerido
-        else:
-            prompt = st.chat_input("Pregunta al analista de datos...")
-        
-        # Mostrar historial
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-        
-        # Procesar nuevo mensaje
-        if prompt:
-            # Mostrar mensaje del usuario
-            with st.chat_message("user"):
-                st.markdown(prompt)
-            st.session_state.messages.append({"role": "user", "content": prompt})
+        # Crear contenedor flotante en la esquina inferior derecha
+        with st.sidebar:
+            st.markdown("---")
+            st.markdown("### 💬 Chat con IA")
             
-            # Generar respuesta
-            with st.chat_message("assistant"):
-                with st.spinner("Analizando datos..."):
-                    response = analizar_con_ia(prompt, df_filtrado, groq_client)
-                    st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            # Toggle para abrir/cerrar chat
+            chat_expandido = st.checkbox("Abrir Asistente IA", value=st.session_state.chat_abierto, key="toggle_chat")
+            st.session_state.chat_abierto = chat_expandido
+            
+            if chat_expandido:
+                st.markdown("**🤖 Data Analyst - Mercado Libre**")
+                st.caption("Pregúntame sobre los productos, precios, opiniones y estrategias de mercado")
+                
+                # Prompts sugeridos (botones más pequeños)
+                st.markdown("##### Prompts Sugeridos:")
+                
+                if st.button("💡 Avatar de Cliente Ideal", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Analiza todas las opiniones para crear un avatar de cliente ideal con características demográficas, psicográficas y necesidades específicas"
+                
+                if st.button("💰 Estrategia de Precio", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Sugerime una estrategia para encontrar el mejor precio de venta del producto analizado basado en la competencia y la percepción de valor"
+                
+                if st.button("📊 Explica los Insights", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Explícame los insights más importantes de estos datos desde una perspectiva de marketing y ventas"
+                
+                if st.button("⭐ Análisis de Opiniones", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Resume los puntos principales de las opiniones de clientes, tanto positivos como negativos"
+                
+                st.markdown("---")
+                
+                # Historial de mensajes (scrollable)
+                chat_container = st.container(height=300)
+                with chat_container:
+                    for message in st.session_state.messages:
+                        with st.chat_message(message["role"]):
+                            st.markdown(message["content"])
+                
+                # Input de chat
+                if "prompt_sugerido" in st.session_state:
+                    prompt = st.session_state.prompt_sugerido
+                    del st.session_state.prompt_sugerido
+                else:
+                    prompt = st.chat_input("Escribe tu pregunta...", key="chat_input_widget")
+                
+                # Procesar nuevo mensaje
+                if prompt:
+                    # Agregar mensaje del usuario
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                    
+                    # Generar respuesta con spinner
+                    with st.spinner("🧠 Analizando datos..."):
+                        response = analizar_con_ia(
+                            prompt, 
+                            df_filtrado, 
+                            groq_client,
+                            json_productos_completo,
+                            json_analisis_completo
+                        )
+                        st.session_state.messages.append({"role": "assistant", "content": response})
+                    
+                    # Rerun para mostrar los nuevos mensajes
+                    st.rerun()
+                
+                # Botón para limpiar historial
+                if len(st.session_state.messages) > 0:
+                    if st.button("🗑️ Limpiar Chat", use_container_width=True):
+                        st.session_state.messages = []
+                        st.rerun()
     else:
-        st.warning("⚠️ Configura GROQ_API_KEY para usar el chatbot IA")
-        st.info("Obtén tu API key en: https://console.groq.com/")
+        with st.sidebar:
+            st.markdown("---")
+            st.warning("⚠️ Chatbot IA no disponible")
+            st.info("Configura `GROQ_API_KEY` para usar el asistente de IA")
+            st.caption("Obtén tu API key en: https://console.groq.com/")
     
     # Footer
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #666; padding: 2rem;'>
-        <p>Dashboard v4.0 con IA | Powered by Streamlit + Groq ❤️</p>
+        <p>Powered by Tomas Cabrera - Apertura IA</p>
         <p>Datos de Mercado Libre Argentina 🇦🇷</p>
     </div>
     """, unsafe_allow_html=True)

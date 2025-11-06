@@ -30,34 +30,69 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 - 📋 **Dos hojas**: Productos + Resumen con estadísticas
 - 📏 **Formato automático**: Anchos de columna ajustados
 
-### 📊 Dashboard Interactivo (dashboard_productos_v4.py) ⭐ NUEVO v4.0
+### 📊 Dashboard Interactivo (dashboard_productos_v4.py) ⭐ ACTUALIZADO v4.2
 - 📊 **Cards de métricas**: Min, Median, Max precio, Total productos
-- 📋 **Tabla mejorada**: Con Resumen IA (join productos + análisis)
-- 🔢 **Sort inteligente**: Ordena correctamente Vendidos y Descuento
+- 📋 **Tabla mejorada**: 
+  - ✅ Resumen IA (join corregido: productos.id ↔ análisis.producto_id)
+  - 🔗 Links clicables a productos de ML
+  - 🔢 Precio_num y Descuento_num (columnas numéricas para filtrado dinámico)
+  - Título, Marca, Precio, Categoría, Calificación, Vendidos, Envío, Descuento
+- 🔢 **Sort inteligente**: Ordena correctamente Vendidos, Descuento, Precio (numéricamente)
+- 🔍 **Búsqueda en Tiempo Real**: 
+  - Barra de búsqueda integrada en sidebar
+  - Ejecuta scraping directamente desde el dashboard
+  - Checkbox opcional para incluir análisis de reseñas
+  - Recarga automática después del scraping
 - ⬇️ **Descarga Excel**: Formato .xlsx en lugar de CSV
 - 📈 **Gráfico dispersión**: Precio vs Ventas (correlación)
 - 📊 **Gráfico barras**: Precio promedio por calificación
 - 🥧 **Gráfico torta**: Marcas más populares (Top 10)
 - 🎚️ **Filtros dinámicos**: Marca, envío, categoría, calificación
-- 🤖 **Chatbot IA**: Asistente con Groq + LLama-3.3-70b
-  - Análisis proactivo de datos
-  - Lenguaje marketinero
-  - Prompts sugeridos (Avatar Cliente, Estrategia Precio)
-  - Explicaciones de gráficos en tiempo real
+- 🤖 **Chatbot IA Mejorado**: Widget en sidebar con Groq + LLama-3.3-70b
+  - 💬 Minimizable/Expandible (ahorra espacio)
+  - 🧠 Acceso completo a JSONs de productos y reseñas
+  - 📊 4 Prompts sugeridos (Avatar Cliente, Estrategia Precio, Insights, Opiniones)
+  - 💾 Historial scrollable + botón de limpieza
+  - 🎯 Análisis proactivo en lenguaje marketinero
 
 ## 🚀 Uso Rápido
 
-### 🎯 Demo v2.0 - Flujo Completo
+### 🎯 Opción 1: Búsqueda desde el Dashboard (v4.2) ⭐ RECOMENDADO
+
+```bash
+# 1. Ejecutar Dashboard
+streamlit run dashboard_productos_v4.py
+
+# 2. En el sidebar:
+#    - Sección "🔍 Búsqueda en Tiempo Real"
+#    - Escribir nombre del producto (ej: "ipad pro")
+#    - Marcar/Desmarcar "Incluir reseñas"
+#    - Click "🔍 Buscar"
+#    - Esperar a que termine el scraping
+#    - Click "🔄 Recargar Dashboard"
+
+# 3. ¡Listo! Los datos ya están en la tabla
+```
+
+### 🎯 Opción 2: Flujo Manual (desde terminal)
 
 ```bash
 # Paso 1: Extraer productos
 python buscar_productos_ml.py "auriculares bluetooth"
 
-# Paso 2: Analizar reseñas con IA
+# Paso 2: Analizar reseñas con IA (opcional pero recomendado)
 python analizar_resenias_ia.py productos_auriculares_bluetooth_*.json
+
+# Paso 3: Ejecutar Dashboard Interactivo
+streamlit run dashboard_productos_v4.py
+
+# Paso 4 (Opcional): Verificar sistema antes de ejecutar
+python test_dashboard_v4.py
 ```
 
-**Ver [DEMO_V2.0.md](DEMO_V2.0.md) para guía completa** ⭐
+**Ver [CHANGELOG_V4.2.md](CHANGELOG_V4.2.md) para detalles de la última actualización** ⭐
+
+**🔧 Fix EOFError**: Si encuentras el error `EOFError` al ejecutar análisis de reseñas desde el dashboard, consulta [FIX_EOFERROR_ANALISIS.md](FIX_EOFERROR_ANALISIS.md) ✅
 
 ### Opción 1: Modo Interactivo
 
@@ -111,13 +146,36 @@ Analisis de Productos/
 2. **Instalar dependencias:**
 
 ```bash
+# Dependencias básicas (scraping)
 pip install requests beautifulsoup4
+
+# Dependencias completas (incluye dashboard y chatbot IA)
+pip install -r requirements.txt
 ```
 
-3. **Ejecutar:**
+3. **Configurar API Key de Groq** (opcional, solo para chatbot IA):
 
 ```bash
-python buscar_productos_ml.py
+# Windows PowerShell
+$env:GROQ_API_KEY="tu_api_key_aqui"
+
+# Windows CMD
+set GROQ_API_KEY=tu_api_key_aqui
+
+# Linux/Mac
+export GROQ_API_KEY=tu_api_key_aqui
+```
+
+💡 **Obtén tu API key gratis en**: https://console.groq.com/
+
+4. **Ejecutar:**
+
+```bash
+# Extracción de productos
+python buscar_productos_ml.py "producto deseado"
+
+# Dashboard interactivo (v4.1)
+streamlit run dashboard_productos_v4.py
 ```
 
 ## 📊 Formato de Salida

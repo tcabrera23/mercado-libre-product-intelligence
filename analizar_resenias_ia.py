@@ -314,11 +314,36 @@ if __name__ == "__main__":
     MAX_PRODUCTOS = None  # None para analizar todos, o número para limitar
     DELAY_ENTRE_PETICIONES = 3  # segundos (más conservador para no ser bloqueado)
     
-    # Preguntar si quiere limitar productos
-    print(f"\n¿Cuántos productos deseas analizar? (Enter para todos)")
-    limite = input("Cantidad (o Enter para todos) ► ").strip()
-    if limite.isdigit():
-        MAX_PRODUCTOS = int(limite)
+    # Detectar si hay argumentos adicionales para límite
+    if len(sys.argv) > 2:
+        limite_arg = sys.argv[2]
+        if limite_arg.isdigit():
+            MAX_PRODUCTOS = int(limite_arg)
+            print(f"\n📊 Analizando {MAX_PRODUCTOS} productos...")
+    else:
+        # Verificar si stdin está disponible (modo interactivo vs subprocess)
+        stdin_available = False
+        try:
+            # Verificar si sys.stdin es un TTY (terminal interactivo)
+            stdin_available = sys.stdin.isatty()
+        except:
+            stdin_available = False
+        
+        if stdin_available:
+            # Modo interactivo: preguntar al usuario
+            print(f"\n¿Cuántos productos deseas analizar? (Enter para todos)")
+            try:
+                limite = input("Cantidad (o Enter para todos) ► ").strip()
+                if limite.isdigit():
+                    MAX_PRODUCTOS = int(limite)
+            except EOFError:
+                # Si falla el input, usar todos
+                print("\n📊 Analizando todos los productos (modo no-interactivo)...")
+                MAX_PRODUCTOS = None
+        else:
+            # Modo no-interactivo (ejecutado desde subprocess): analizar todos
+            print("\n📊 Analizando todos los productos (modo no-interactivo)...")
+            MAX_PRODUCTOS = None
     
     try:
         # Analizar productos
