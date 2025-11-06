@@ -1,11 +1,12 @@
 """
-Script para analizar reseñas de productos de Mercado Libre
+Script para analizar reseñas de productos de Mercado Libre (VERSIÓN SIMPLIFICADA)
 
 Este script:
 1. Lee los JSON de productos generados por buscar_productos_ml.py
-2. Extrae el "Resumen de opiniones generado por IA" de cada producto
-3. Extrae el top 5 de opiniones con 1 estrella
-4. Genera un JSON con los resultados
+2. Extrae solo el "Resumen de opiniones generado por IA" de cada producto
+3. Genera un JSON con los resultados
+
+NOTA: Esta versión NO extrae opiniones individuales (más rápido y eficiente)
 """
 
 from bs4 import BeautifulSoup
@@ -27,22 +28,17 @@ if sys.platform == 'win32':
         pass
 
 
-def extraer_resumen_ia_y_opiniones_1_estrella(url_producto, producto_id):
+def extraer_resumen_ia(url_producto, producto_id):
     """
-    Extrae el resumen de IA y las opiniones de 1 estrella de un producto
+    Extrae solo el resumen de IA de un producto
     
     Args:
         url_producto: URL del producto en Mercado Libre
         producto_id: ID único del producto
         
     Returns:
-        dict: Contiene resumen_ia y lista de opiniones_1_estrella
+        str: Resumen de IA o None si no se encuentra
     """
-    resultado = {
-        'resumen_ia': None,
-        'opiniones_1_estrella': []
-    }
-    
     try:
         # Headers para simular un navegador real
         headers = {
@@ -59,10 +55,7 @@ def extraer_resumen_ia_y_opiniones_1_estrella(url_producto, producto_id):
         # Parsear el HTML
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # ===== EXTRAER RESUMEN DE IA =====
-        # Selector CSS: #reviews_capability_v3 > div > section > div > div:nth-child(2) > div.ui-review-capability-filter > div.ui-review-capability-filter__comments > div.ui-review-capability__summary > div.ui-review-capability__summary__plain_text > p
-        
-        # Intentar con el ID específico
+        # EXTRAER RESUMEN DE IA
         reviews_section = soup.find('div', id='reviews_capability_v3')
         
         if reviews_section:
@@ -72,8 +65,9 @@ def extraer_resumen_ia_y_opiniones_1_estrella(url_producto, producto_id):
             if resumen_container:
                 resumen_p = resumen_container.find('p')
                 if resumen_p:
-                    resultado['resumen_ia'] = resumen_p.get_text().strip()
-                    print(f"  ✅ Resumen de IA encontrado ({len(resultado['resumen_ia'])} caracteres)")
+                    resumen = resumen_p.get_text().strip()
+                    print(f"  ✅ Resumen de IA encontrado ({len(resumen)} caracteres)")
+                    return resumen
                 else:
                     print(f"  ⚠️  No se encontró el elemento <p> del resumen de IA")
             else:
@@ -81,238 +75,196 @@ def extraer_resumen_ia_y_opiniones_1_estrella(url_producto, producto_id):
         else:
             print(f"  ⚠️  No se encontró la sección de reviews")
         
-        # ===== EXTRAER OPINIONES DE 1 ESTRELLA =====
-        # Buscar todos los artículos de opiniones
-        articulos_opiniones = soup.find_all('article', class_='ui-review-capability-comments__comment')
+        return None
         
-        opiniones_1_estrella = []
-        
-        for articulo in articulos_opiniones:
-            try:
-                # Extraer calificación (contar estrellas activas)
-                rating_container = articulo.find('div', class_='ui-review-capability-comments__comment__rating')
-                calificacion = 0
-                
-                if rating_container:
-                    # Contar SVGs con la clase que indica estrella activa
-                    estrellas_activas = rating_container.find_all('svg')
-                    
-                    # Determinar calificación basándose en las clases o estructura
-                    # Mercado Libre usa diferentes estructuras, intentemos contar las estrellas "filled"
-                    for estrella in estrellas_activas:
-                        # Si tiene una clase que indica que está llena, contarla
-                        clases = estrella.get('class', [])
-                        if 'ui-review-capability-comments__comment__rating__star' in clases:
-                            calificacion += 1
-                
-                # Solo procesar si es calificación de 1 estrella
-                if calificacion == 1:
-                    # Extraer fecha
-                    fecha_element = articulo.find('span', class_='ui-review-capability-comments__comment__date')
-                    fecha = fecha_element.text.strip() if fecha_element else "Fecha no disponible"
-                    
-                    # Extraer contenido de la opinión
-                    contenido_element = articulo.find('p', class_='ui-review-capability-comments__comment__content')
-                    contenido = contenido_element.text.strip() if contenido_element else "Contenido no disponible"
-                    
-                    # Extraer cantidad de "Es útil"
-                    util_element = articulo.find('p', class_='ui-review-capability-valorizations__button-like__text')
-                    util_count = util_element.text.strip() if util_element else "0"
-                    
-                    # Verificar si hay imágenes en la reseña
-                    tiene_imagenes = bool(articulo.find('div', class_='ui-review-capability-comments__comment__carousel'))
-                    
-                    opinion = {
-                        'calificacion': calificacion,
-                        'fecha': fecha,
-                        'contenido': contenido,
-                        'util_count': util_count,
-                        'tiene_imagenes': tiene_imagenes
-                    }
-                    
-                    opiniones_1_estrella.append(opinion)
-                    
-                    # Limitar a top 5
-                    if len(opiniones_1_estrella) >= 5:
-                        break
-                        
-            except Exception as e:
-                print(f"    ⚠️  Error procesando opinión: {e}")
-                continue
-        
-        resultado['opiniones_1_estrella'] = opiniones_1_estrella
-        print(f"  ✅ {len(opiniones_1_estrella)} opiniones de 1 estrella encontradas")
-        
-    except requests.exceptions.RequestException as e:
-        print(f"  ❌ Error al acceder al producto {producto_id}: {e}")
+    except requests.Timeout:
+        print(f"  ⏱️  Timeout al acceder a {url_producto}")
+        return None
+    except requests.RequestException as e:
+        print(f"  ❌ Error de conexión: {e}")
+        return None
     except Exception as e:
         print(f"  ❌ Error inesperado: {e}")
-    
-    return resultado
+        return None
 
 
-def analizar_productos_desde_json(productos_json_path, max_productos=None, delay=3):
+def analizar_productos_desde_json(archivo_json, max_productos=None, delay=2):
     """
-    Analiza productos desde un archivo JSON generado por buscar_productos_ml.py
+    Analiza productos desde un archivo JSON
     
     Args:
-        productos_json_path: Ruta al archivo JSON de productos
-        max_productos: Cantidad máxima de productos a analizar (None para todos)
+        archivo_json: Path al archivo JSON de productos
+        max_productos: Número máximo de productos a analizar (None = todos)
         delay: Segundos de espera entre peticiones
         
     Returns:
-        list: Lista de resultados con análisis de cada producto
+        tuple: (lista de resultados, nombre del producto buscado)
     """
-    # Cargar productos desde el JSON
-    print(f"📂 Cargando productos desde: {productos_json_path}")
+    print(f"\n{'='*100}")
+    print(f"🔍 ANÁLISIS DE RESEÑAS DE MERCADO LIBRE (VERSIÓN SIMPLIFICADA)")
+    print(f"{'='*100}\n")
     
-    with open(productos_json_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+    # Cargar el JSON de productos
+    print(f"📂 Cargando: {archivo_json}")
     
-    # El JSON tiene estructura con metadata
+    try:
+        with open(archivo_json, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"❌ Error: No se encontró el archivo '{archivo_json}'")
+        sys.exit(1)
+    except json.JSONDecodeError:
+        print(f"❌ Error: El archivo no es un JSON válido")
+        sys.exit(1)
+    
     productos = data.get('productos', [])
-    producto_buscado = data.get('producto_buscado', 'desconocido')
+    producto_buscado = data.get('producto_buscado', 'Desconocido')
     
-    print(f"✅ Archivo cargado: {len(productos)} productos encontrados")
-    print(f"📦 Producto buscado: {producto_buscado}")
+    total_productos = len(productos)
+    productos_a_analizar = min(max_productos, total_productos) if max_productos else total_productos
     
-    # Limitar cantidad de productos si se especifica
-    if max_productos:
-        productos = productos[:max_productos]
-        print(f"⚠️  Limitando análisis a {max_productos} productos")
+    print(f"✅ Archivo cargado correctamente")
+    print(f"📊 Total de productos en archivo: {total_productos}")
+    print(f"🎯 Productos a analizar: {productos_a_analizar}")
+    print(f"⏱️  Delay entre peticiones: {delay} segundos")
+    print(f"\n{'='*100}\n")
     
     resultados = []
+    productos_con_resumen = 0
     
-    print(f"\n{'='*100}")
-    print(f"🔍 INICIANDO ANÁLISIS DE RESEÑAS CON IA")
-    print(f"{'='*100}")
-    print(f"⏰ Delay entre peticiones: {delay} segundos\n")
-    
-    for i, producto in enumerate(productos, 1):
-        producto_id = producto['id']
-        titulo = producto['titulo']
-        link = producto['link']
+    # Procesar cada producto
+    for idx, producto in enumerate(productos[:productos_a_analizar], 1):
+        producto_id = producto.get('id', f'unknown_{idx}')
+        titulo = producto.get('titulo', 'Sin título')
+        link = producto.get('link', '')
         calificacion = producto.get('calificacion', 0)
+        precio = producto.get('precio_actual', 'N/A')
         
-        print(f"\n[{i}/{len(productos)}] 🔎 Analizando: {producto_id}")
-        print(f"   📱 Producto: {titulo[:70]}...")
-        print(f"   ⭐ Calificación: {calificacion}")
+        print(f"[{idx}/{productos_a_analizar}] 🔍 Analizando: {titulo[:60]}...")
+        print(f"  📍 ID: {producto_id}")
+        print(f"  ⭐ Calificación: {calificacion}")
+        print(f"  💰 Precio: {precio}")
         
-        if link == "No disponible":
-            print("   ⚠️  Sin link disponible, saltando...")
+        if not link:
+            print(f"  ⚠️  Producto sin link, saltando...")
+            resultados.append({
+                'producto_id': producto_id,
+                'producto_titulo': titulo,
+                'producto_link': link,
+                'producto_calificacion': calificacion,
+                'producto_precio': precio,
+                'resumen_ia': None,
+                'timestamp_extraccion': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
             continue
         
-        # Extraer resumen de IA y opiniones de 1 estrella
-        analisis = extraer_resumen_ia_y_opiniones_1_estrella(link, producto_id)
+        # Extraer resumen de IA
+        resumen_ia = extraer_resumen_ia(link, producto_id)
         
-        # Crear resultado para este producto
-        resultado_producto = {
+        if resumen_ia:
+            productos_con_resumen += 1
+        
+        # Guardar resultado
+        resultados.append({
             'producto_id': producto_id,
             'producto_titulo': titulo,
             'producto_link': link,
             'producto_calificacion': calificacion,
-            'producto_precio': producto.get('precio_actual', 'No disponible'),
-            'resumen_ia': analisis['resumen_ia'],
-            'opiniones_1_estrella': analisis['opiniones_1_estrella'],
-            'total_opiniones_1_estrella': len(analisis['opiniones_1_estrella']),
-            'timestamp_extraccion': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
+            'producto_precio': precio,
+            'resumen_ia': resumen_ia,
+            'timestamp_extraccion': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
         
-        resultados.append(resultado_producto)
+        print(f"  ✅ Análisis completado\n")
         
-        # Delay para no sobrecargar el servidor
-        if i < len(productos):
-            print(f"   ⏳ Esperando {delay} segundos...")
+        # Delay entre peticiones para no saturar el servidor
+        if idx < productos_a_analizar:
             time.sleep(delay)
+    
+    print(f"{'='*100}\n")
+    print(f"📊 RESUMEN DEL ANÁLISIS:")
+    print(f"  • Total productos analizados: {productos_a_analizar}")
+    print(f"  • Productos con resumen IA: {productos_con_resumen}")
+    print(f"  • Productos sin resumen: {productos_a_analizar - productos_con_resumen}")
+    print(f"\n{'='*100}\n")
     
     return resultados, producto_buscado
 
 
 def mostrar_resumen_analisis(resultados, producto_buscado):
-    """
-    Muestra un resumen del análisis de reseñas
-    """
+    """Muestra un resumen del análisis realizado"""
     print(f"\n{'='*100}")
-    print(f"📊 RESUMEN DEL ANÁLISIS DE RESEÑAS")
+    print(f"📊 RESUMEN DE ANÁLISIS - {producto_buscado.upper()}")
     print(f"{'='*100}\n")
     
-    total_con_resumen_ia = sum(1 for r in resultados if r['resumen_ia'])
-    total_opiniones_1_estrella = sum(r['total_opiniones_1_estrella'] for r in resultados)
+    total_productos = len(resultados)
+    total_con_resumen = sum(1 for r in resultados if r['resumen_ia'])
     
-    print(f"🔍 Producto analizado: {producto_buscado}")
-    print(f"📦 Productos procesados: {len(resultados)}")
-    print(f"🤖 Productos con resumen de IA: {total_con_resumen_ia}/{len(resultados)}")
-    print(f"⭐ Total de opiniones de 1 estrella: {total_opiniones_1_estrella}")
-    print(f"📅 Fecha de análisis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"📦 Total de productos: {total_productos}")
+    print(f"✅ Con resumen IA: {total_con_resumen}")
+    print(f"❌ Sin resumen IA: {total_productos - total_con_resumen}")
     
-    print(f"\n📋 Detalle por producto:")
-    for i, resultado in enumerate(resultados, 1):
-        print(f"\n{i}. {resultado['producto_titulo'][:60]}...")
-        print(f"   ID: {resultado['producto_id']}")
-        print(f"   Calificación: {resultado['producto_calificacion']}")
-        print(f"   Resumen IA: {'✅ Disponible' if resultado['resumen_ia'] else '❌ No disponible'}")
-        print(f"   Opiniones 1★: {resultado['total_opiniones_1_estrella']}")
+    if total_con_resumen > 0:
+        porcentaje = (total_con_resumen / total_productos) * 100
+        print(f"📈 Tasa de éxito: {porcentaje:.1f}%")
         
-        # Mostrar preview del resumen de IA
-        if resultado['resumen_ia']:
-            preview = resultado['resumen_ia'][:100]
-            print(f"   Preview: \"{preview}...\"")
+        # Mostrar algunos ejemplos de resúmenes
+        print(f"\n🌟 EJEMPLOS DE RESÚMENES:")
+        ejemplos = [r for r in resultados if r['resumen_ia']][:3]
         
-        # Mostrar ejemplo de opinión de 1 estrella
-        if resultado['opiniones_1_estrella']:
-            primera_opinion = resultado['opiniones_1_estrella'][0]['contenido'][:80]
-            print(f"   Opinión 1★: \"{primera_opinion}...\"")
+        for idx, ejemplo in enumerate(ejemplos, 1):
+            print(f"\n  [{idx}] {ejemplo['producto_titulo'][:50]}...")
+            print(f"      Resumen: {ejemplo['resumen_ia'][:150]}...")
+    
+    print(f"\n{'='*100}\n")
 
 
 def guardar_resultados(resultados, producto_buscado):
-    """
-    Guarda los resultados en un archivo JSON
-    """
+    """Guarda los resultados en un archivo JSON"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     nombre_archivo = f"analisis_resenias_{producto_buscado.replace(' ', '_')}_{timestamp}.json"
+    #nombre_archivo = "productos_heladeras_20251105_230546.json"
     
-    # Preparar datos para guardar
     datos_salida = {
         'producto_analizado': producto_buscado,
-        'fecha_analisis': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'fecha_analisis': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'total_productos': len(resultados),
         'total_con_resumen_ia': sum(1 for r in resultados if r['resumen_ia']),
-        'total_opiniones_1_estrella': sum(r['total_opiniones_1_estrella'] for r in resultados),
         'productos': resultados
     }
     
     with open(nombre_archivo, 'w', encoding='utf-8') as f:
         json.dump(datos_salida, f, ensure_ascii=False, indent=2)
     
-    print(f"\n💾 Resultados guardados en: {nombre_archivo}")
+    print(f"💾 Resultados guardados en: {nombre_archivo}")
     return nombre_archivo
 
 
 if __name__ == "__main__":
-    print("\n" + "="*100)
-    print("🤖 ANÁLISIS DE RESEÑAS CON IA - MERCADO LIBRE")
-    print("="*100 + "\n")
+    print(f"\n{'#'*100}")
+    print(f"# ANÁLISIS DE RESEÑAS DE MERCADO LIBRE - VERSIÓN SIMPLIFICADA")
+    print(f"# Solo extrae resúmenes de IA (más rápido y eficiente)")
+    print(f"{'#'*100}\n")
     
-    # Configuración
-    if len(sys.argv) > 1:
-        # Usar argumento de línea de comandos
-        ARCHIVO_PRODUCTOS = sys.argv[1]
-    else:
-        # Modo interactivo
-        print("📝 Este script analiza las reseñas de productos extraídos por buscar_productos_ml.py")
-        print("\nEjemplos de archivos:")
-        print("  • productos_ipad_20251104_210247.json")
-        print("  • productos_auriculares_20251104_202812.json")
-        print()
-        ARCHIVO_PRODUCTOS = input("📂 Ingresa el nombre del archivo JSON de productos ► ").strip()
-        
-        if not ARCHIVO_PRODUCTOS:
-            print("❌ No ingresaste ningún archivo")
-            sys.exit(1)
+    # Obtener archivo JSON de productos
+    if len(sys.argv) < 2:
+        print("❌ Error: Debes especificar un archivo JSON de productos")
+        print("\n❓ Uso:")
+        print("  python analizar_resenias_ia.py <archivo_productos.json> [cantidad_opcional]")
+        print("\n📝 Ejemplos:")
+        print("  python analizar_resenias_ia.py productos_auriculares_20241104.json")
+        print("  python analizar_resenias_ia.py productos_auriculares_20241104.json 10")
+        sys.exit(1)
+    
+    ARCHIVO_PRODUCTOS = sys.argv[1]
+    
+    if not ARCHIVO_PRODUCTOS:
+        print("❌ No se especificó ningún archivo")
+        sys.exit(1)
     
     # Configuración de análisis
-    MAX_PRODUCTOS = None  # None para analizar todos, o número para limitar
-    DELAY_ENTRE_PETICIONES = 3  # segundos (más conservador para no ser bloqueado)
+    MAX_PRODUCTOS = None  # Por defecto: analizar TODOS los productos
+    DELAY_ENTRE_PETICIONES = 2  # segundos
     
     # Detectar si hay argumentos adicionales para límite
     if len(sys.argv) > 2:
@@ -320,30 +272,10 @@ if __name__ == "__main__":
         if limite_arg.isdigit():
             MAX_PRODUCTOS = int(limite_arg)
             print(f"\n📊 Analizando {MAX_PRODUCTOS} productos...")
-    else:
-        # Verificar si stdin está disponible (modo interactivo vs subprocess)
-        stdin_available = False
-        try:
-            # Verificar si sys.stdin es un TTY (terminal interactivo)
-            stdin_available = sys.stdin.isatty()
-        except:
-            stdin_available = False
-        
-        if stdin_available:
-            # Modo interactivo: preguntar al usuario
-            print(f"\n¿Cuántos productos deseas analizar? (Enter para todos)")
-            try:
-                limite = input("Cantidad (o Enter para todos) ► ").strip()
-                if limite.isdigit():
-                    MAX_PRODUCTOS = int(limite)
-            except EOFError:
-                # Si falla el input, usar todos
-                print("\n📊 Analizando todos los productos (modo no-interactivo)...")
-                MAX_PRODUCTOS = None
         else:
-            # Modo no-interactivo (ejecutado desde subprocess): analizar todos
-            print("\n📊 Analizando todos los productos (modo no-interactivo)...")
-            MAX_PRODUCTOS = None
+            print(f"\n⚠️  Argumento '{limite_arg}' no válido, analizando todos los productos...")
+    else:
+        print(f"\n📊 Analizando TODOS los productos del archivo...")
     
     try:
         # Analizar productos
@@ -372,4 +304,3 @@ if __name__ == "__main__":
         print(f"\n❌ Error inesperado: {e}")
         import traceback
         traceback.print_exc()
-

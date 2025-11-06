@@ -1,0 +1,458 @@
+{
+  "producto_analizado": "playstation",
+  "fecha_analisis": "2025-11-06 00:11:02",
+  "total_productos": 50,
+  "total_con_resumen_ia": 13,
+  "productos": [
+    {
+      "producto_id": "a868f264",
+      "producto_titulo": "Consola Sony Playstation PS4 Spider Man 2020 Color Negro 1 TB - Excelente (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-sony-playstation-ps4-spider-man-2020-color-negro-1-tb-excelente-reacondicionado/p/MLA2013743969#polycard_client=search-nordic&search_layout=stack&position=1&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1539224943&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$699.998",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:08:38"
+    },
+    {
+      "producto_id": "93f23057",
+      "producto_titulo": "Consola Playstation 5 Slim Digital + Juegos Astro Bot Y Gt7",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-playstation-5-slim-digital-juegos-astro-bot-y-gt7/p/MLA57078869#polycard_client=search-nordic&search_layout=stack&position=2&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2404747872&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$999.999",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:08:42"
+    },
+    {
+      "producto_id": "363f9e09",
+      "producto_titulo": "Sony Playstation 5 Slim 1tb Digital Bundle Ratchet & Clank",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-1tb-digital-bundle-ratchet-clank/p/MLA37300294#polycard_client=search-nordic&search_layout=stack&position=3&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1558451445&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$1.060.900",
+      "resumen_ia": "La consola ofrece una excelente calidad gráfica y sonora, con un salto generacional notable desde modelos anteriores. Su diseño es atractivo y el precio es considerado razonable por muchos.",
+      "timestamp_extraccion": "2025-11-06 00:08:44"
+    },
+    {
+      "producto_id": "2192df92",
+      "producto_titulo": "Consola Sony PlayStation 5 Slim Blanco 4K 1TB Digital",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-sony-playstation-5-slim-blanco-4k-1tb-digital/p/MLA29001054#polycard_client=search-nordic&search_layout=stack&position=4&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1811042304&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$986.700",
+      "resumen_ia": "El producto es de excelente calidad y ofrece una experiencia de juego espectacular. La consola destaca por su diseño hermoso y cuidado, además de proporcionar imágenes nítidas y un rendimiento superior al de su predecesora. Es una opción ideal para quienes buscan diversión y recreación, siendo muy apreciada por quienes la han adquirido.",
+      "timestamp_extraccion": "2025-11-06 00:08:47"
+    },
+    {
+      "producto_id": "db454cb5",
+      "producto_titulo": "Consola Sony Playstation 5 Slim Digital 1tb Digital Color Blanco/negro",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-sony-playstation-5-slim-digital-1tb-digital-color-blanconegro/p/MLA49823636#polycard_client=search-nordic&search_layout=stack&position=5&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2389804040&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$1.070.000",
+      "resumen_ia": "El producto es de excelente calidad, cumpliendo con las expectativas de los usuarios. La marca Sony sigue destacándose por su impecable rendimiento. En general, es considerado uno de los mejores en su categoría.",
+      "timestamp_extraccion": "2025-11-06 00:08:50"
+    },
+    {
+      "producto_id": "7fac2afd",
+      "producto_titulo": "Sony Playstation 5 Slim 1tb Standard Bundle Astro Bot Y Gran Turismo 7",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-1tb-standard-bundle-astro-bot-y-gran-turismo-7/p/MLA53197633#polycard_client=search-nordic&search_layout=stack&position=6&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1574504813&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$1.424.999",
+      "resumen_ia": "La consola ofrece un salto increíble de calidad en gráficos y jugabilidad. Es considerada una excelente inversión por su rendimiento y calidad, proporcionando una experiencia de juego inmersiva. Además, destaca por su diseño atractivo y su capacidad para ofrecer entretenimiento de alta calidad.",
+      "timestamp_extraccion": "2025-11-06 00:08:53"
+    },
+    {
+      "producto_id": "bbd6160a",
+      "producto_titulo": "Consola Playstation 4 Pro 1tb + Joystick Nuevo Negro (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-playstation-4-pro-1tb--joystick-nuevo/up/MLAU3263517208#polycard_client=search-nordic&search_layout=stack&position=7&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2142915054&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$650.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:08:56"
+    },
+    {
+      "producto_id": "b40bc7cc",
+      "producto_titulo": "Sony Playstation 3 Slim O Super Slim 500gb + 2 Joystick. - Negro (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-3-slim-o-super-slim-500gb--2-joystick/up/MLAU3342547507#polycard_client=search-nordic&search_layout=stack&position=8&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2220099928&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$414.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:00"
+    },
+    {
+      "producto_id": "639c6d5a",
+      "producto_titulo": "Sony PlayStation 5 Pro CFI-7020 2TB Digital color blanco 2024",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-pro-cfi-7020-2tb-digital-color-blanco-2024/p/MLA41975964#polycard_client=search-nordic&search_layout=stack&position=9&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1964014296&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$1.840.000",
+      "resumen_ia": "La consola ofrece un rendimiento excepcional y supera las expectativas de los usuarios. Su diseño elegante y su capacidad para proporcionar una experiencia de juego de alta calidad la hacen destacar. Es una opción recomendada para quienes buscan un salto significativo en calidad desde modelos anteriores.",
+      "timestamp_extraccion": "2025-11-06 00:09:03"
+    },
+    {
+      "producto_id": "cf459700",
+      "producto_titulo": "Sony Playstation 5 Slim 1tb Standard Bundle Ratchet & Clank Blanco/Negro",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-1tb-standard-bundle-ratchet-clank-blanconegro/p/MLA39459985#polycard_client=search-nordic&search_layout=stack&position=10&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1965980092&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$1.199.999",
+      "resumen_ia": "La consola ofrece una excelente calidad de imagen y sonido, con un rendimiento rápido y fluido. Es muy apreciada por su capacidad para mejorar la experiencia de juego, especialmente con los gráficos avanzados y la jugabilidad mejorada en comparación con modelos anteriores. Además, los juegos incluidos son de alta calidad, lo que la convierte en una opción muy valorada para disfrutar de momentos de entretenimiento.",
+      "timestamp_extraccion": "2025-11-06 00:09:05"
+    },
+    {
+      "producto_id": "5dae4dd0",
+      "producto_titulo": "Sony Playstation 5 Call Of Duty: Black Ops 6 Paquete de color blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-call-of-duty-black-ops-6-paquete-de-color-blanco/p/MLA51505632#polycard_client=search-nordic&search_layout=stack&position=11&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2186778014&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$837.093",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:08"
+    },
+    {
+      "producto_id": "ef6718ab",
+      "producto_titulo": "Playstation Portal Remote Player Reproductor Portátil - Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/playstation-portal-remote-player-reproductor-portatil-blanco/p/MLA29237742#polycard_client=search-nordic&search_layout=stack&position=12&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2079514594&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$383.251",
+      "resumen_ia": "El producto es de excelente calidad y ofrece una experiencia visual perfecta, incluso con conexiones de internet más lentas. Es práctico y cómodo, ideal para usar sin necesidad de una pantalla grande.",
+      "timestamp_extraccion": "2025-11-06 00:09:11"
+    },
+    {
+      "producto_id": "fa69419b",
+      "producto_titulo": "Sony Playstation 4 500gb + Gta V + Joystick Nuevo - Negro (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-500gb--gta-v--joystick-nuevo/up/MLAU3317245430#polycard_client=search-nordic&search_layout=stack&position=13&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2192951336&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$535.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:14"
+    },
+    {
+      "producto_id": "95e3c4f1",
+      "producto_titulo": "Casco Y Control Sony Playstation Vr2 Horizon Call Mountain Color Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/casco-y-control-sony-playstation-vr2-horizon-call-mountain-color-blanco/p/MLA25906230#polycard_client=search-nordic&search_layout=stack&position=14&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2170555758&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$999.994",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:17"
+    },
+    {
+      "producto_id": "16b3c291",
+      "producto_titulo": "Sony PlayStation 5 slim 1TB extra dualSense controller color blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-1tb-extra-dualsense-controller-color-blanco/p/MLA29725752#polycard_client=search-nordic&search_layout=stack&position=15&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1811090650&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$1.690.000",
+      "resumen_ia": "El producto funciona de manera espectacular y a la perfección. Ofrece un nivel superior de experiencia de juego. En general, cumple con las expectativas y proporciona satisfacción a los usuarios.",
+      "timestamp_extraccion": "2025-11-06 00:09:20"
+    },
+    {
+      "producto_id": "0870d16c",
+      "producto_titulo": "Sony Playstation 5 Consola Ps5 Edicion Aniversario 30th",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-consola-ps5-edicion-aniversario-30th/p/MLA42024580#polycard_client=search-nordic&search_layout=stack&position=16&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1476172913&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$1.399.999",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:22"
+    },
+    {
+      "producto_id": "4381335d",
+      "producto_titulo": "Sony PlayStation 4 Slim CUH-20 1TB Standard color negro azabache 2020",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-slim-cuh-20-1tb-standard-color-negro-azabache-2020/p/MLA6252348#polycard_client=search-nordic&search_layout=stack&position=17&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2479740136&sid=search",
+      "producto_calificacion": 4.3,
+      "producto_precio": "$585.500",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:25"
+    },
+    {
+      "producto_id": "bdd4a0e5",
+      "producto_titulo": "Ps2 Playstation 2 32gb Jugá X Usb Sony",
+      "producto_link": "https://www.mercadolibre.com.ar/ps2-playstation-2-32gb-juga-x-usb-sony/p/MLA23135636#polycard_client=search-nordic&search_layout=stack&position=18&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2357179942&sid=search",
+      "producto_calificacion": 4.6,
+      "producto_precio": "$187.232",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:28"
+    },
+    {
+      "producto_id": "30847a62",
+      "producto_titulo": "Consola Sony PlayStation 5 Slim Standard 1TB",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-sony-playstation-5-slim-standard-1tb/p/MLA28726294#polycard_client=search-nordic&search_layout=stack&position=19&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1504686821&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$1.399.999",
+      "resumen_ia": "La consola ofrece un rendimiento excelente y es muy completa, asegurando una experiencia de juego fluida y de alta calidad. Es altamente recomendada por su capacidad para entretener y su funcionamiento impecable. Además, viene con la oblea de seguridad de PlayStation, lo que garantiza su autenticidad y calidad.",
+      "timestamp_extraccion": "2025-11-06 00:09:31"
+    },
+    {
+      "producto_id": "4f49cda2",
+      "producto_titulo": "Sony Playstation 5 Slim Versión Digital Astro Bot Bundle Color Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-version-digital-astro-bot-bundle-color-blanco/p/MLA47847065#polycard_client=search-nordic&search_layout=stack&position=20&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2407880576&sid=search",
+      "producto_calificacion": 4.6,
+      "producto_precio": "$1.790.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:34"
+    },
+    {
+      "producto_id": "f526a0b8",
+      "producto_titulo": "Sony PlayStation 5 Slim 1TB Standard color blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-1tb-standard-color-blanco/p/MLA28616777#polycard_client=search-nordic&search_layout=stack&position=21&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1619553536&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$1.110.000",
+      "resumen_ia": "Es un producto excelente y muy recomendable, destacando por su calidad y funcionamiento sin problemas. Es más silenciosa que la versión anterior, lo que ha dejado a los usuarios muy conformes con el cambio. Además, su rendimiento y diseño la convierten en una consola espectacular y satisfactoria para quienes la utilizan.",
+      "timestamp_extraccion": "2025-11-06 00:09:37"
+    },
+    {
+      "producto_id": "95d020cf",
+      "producto_titulo": "Playstation 5 Slim 1tb Fortnite Cobalt Star Bundle Soy Gamer Color Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/playstation-5-slim-1tb-fortnite-cobalt-star-bundle-soy-gamer-color-blanco/p/MLA47414777#polycard_client=search-nordic&search_layout=stack&position=22&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2345296158&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$1.120.068",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:40"
+    },
+    {
+      "producto_id": "3b97af1c",
+      "producto_titulo": "Sonyplaystation 4 500gb + 2 Joysticks + Juego + Envio Gratis - Gris (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sonyplaystation-4-500gb--2-joysticks--juego--envio-gratis/up/MLAU3375852420#polycard_client=search-nordic&search_layout=stack&position=23&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2270986438&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$740.555",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:43"
+    },
+    {
+      "producto_id": "c7126d25",
+      "producto_titulo": "Sony Playstation 3 Slim + 30 Juegos! Gta 5 - Fifa - Pes - Negro (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-3-slim--30-juegos-gta-5--fifa--pes/up/MLAU3080421527#polycard_client=search-nordic&search_layout=stack&position=24&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2035602490&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$329.799",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:46"
+    },
+    {
+      "producto_id": "694dd056",
+      "producto_titulo": "Sony Playstation 4 Slim 1 Tb Color Negro",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-slim-1-tb-color-negro/p/MLA23248125#polycard_client=search-nordic&search_layout=stack&position=25&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2414746288&sid=search",
+      "producto_calificacion": 4.3,
+      "producto_precio": "$686.173",
+      "resumen_ia": "La consola ofrece un excelente precio y satisfacción general. Sin embargo, puede presentar problemas al encender, requiriendo reinicios frecuentes.",
+      "timestamp_extraccion": "2025-11-06 00:09:48"
+    },
+    {
+      "producto_id": "36f106a2",
+      "producto_titulo": "Sony PlayStation 3 Super Slim 250GB Grand Theft Auto V color charcoal black 2013 - Excelente (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-3-super-slim-250gb-grand-theft-auto-v-color-charcoal-black-2013-excelente-reacondicionado/p/MLA2014100480#polycard_client=search-nordic&search_layout=stack&position=26&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1537525983&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$341.063",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:51"
+    },
+    {
+      "producto_id": "75948167",
+      "producto_titulo": "Sony Playstation 5 825gb estándar blanco y negro - Excelente (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-825gb-estandar-blanco-y-negro-excelente-reacondicionado/p/MLA2013744733#polycard_client=search-nordic&search_layout=stack&position=27&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1542896835&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$879.999",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:54"
+    },
+    {
+      "producto_id": "3d96b84a",
+      "producto_titulo": "Consola Playstation 4 Slim 1 Tb + 1 Juego + Joystick - Negro (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-playstation-4-slim-1-tb--1-juego--joystick/up/MLAU3216256775#polycard_client=search-nordic&search_layout=stack&position=28&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2101553462&sid=search",
+      "producto_calificacion": 4.7,
+      "producto_precio": "$530.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:57"
+    },
+    {
+      "producto_id": "c7f01c6d",
+      "producto_titulo": "Sony PlayStation 4 500GB Standard color negro azabache",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-500gb-standard-color-negro-azabache/p/MLA6252195#polycard_client=search-nordic&search_layout=stack&position=29&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2351361156&sid=search",
+      "producto_calificacion": 4.4,
+      "producto_precio": "$574.257",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:09:59"
+    },
+    {
+      "producto_id": "321f55f1",
+      "producto_titulo": "Consola Sony Ps5 Disc Slim Edición Cod Black Ops 6",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-sony-ps5-disc-slim-edicion-cod-black-ops-6/p/MLA51564263#polycard_client=search-nordic&search_layout=stack&position=30&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2473238280&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$1.180.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:02"
+    },
+    {
+      "producto_id": "6447a29c",
+      "producto_titulo": "Consola Playstation 4 Slim 500gb + 1 Juego + Joystick Nuevo - Negro (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-playstation-4-slim-500gb--1-juego--joystick-nuevo/up/MLAU3201920817#polycard_client=search-nordic&search_layout=stack&position=31&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2094309048&sid=search",
+      "producto_calificacion": 4.6,
+      "producto_precio": "$530.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:06"
+    },
+    {
+      "producto_id": "9498273f",
+      "producto_titulo": "Sony PlayStation 5 Slim Standard CFI-2000A 1TB Standard Color Blanco 2023",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-standard-cfi-2000a-1tb-standard-color-blanco-2023/p/MLA37331830#polycard_client=search-nordic&search_layout=stack&position=32&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1999744516&sid=search",
+      "producto_calificacion": 4.6,
+      "producto_precio": "$1.880.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:09"
+    },
+    {
+      "producto_id": "4cb4d3b1",
+      "producto_titulo": "Sony PlayStation 3 Super Slim 250GB Standard color charcoal black 2012 - Excelente (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-3-super-slim-250gb-standard-color-charcoal-black-2012-excelente-reacondicionado/p/MLA2013745713#polycard_client=search-nordic&search_layout=stack&position=33&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2073472920&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$300.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:12"
+    },
+    {
+      "producto_id": "c0e46396",
+      "producto_titulo": "Consola Ps5 Slim Con Lectora 1 Tb+ Fc 26 Dig. Soy Gamer - Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-ps5-slim-con-lectora-1-tb-fc-26-dig-soy-gamer/up/MLAU1659498912#polycard_client=search-nordic&search_layout=stack&position=34&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1921477188&sid=search",
+      "producto_calificacion": 4.6,
+      "producto_precio": "$1.249.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:15"
+    },
+    {
+      "producto_id": "8636466e",
+      "producto_titulo": "Sony PlayStation 4 Slim CUH-20 500GB Standard color negro azabache",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-slim-cuh-20-500gb-standard-color-negro-azabache/p/MLA6252346#polycard_client=search-nordic&search_layout=stack&position=35&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2413883844&sid=search",
+      "producto_calificacion": 4.3,
+      "producto_precio": "$550.500",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:18"
+    },
+    {
+      "producto_id": "738c2642",
+      "producto_titulo": "Sony PlayStation 4 Slim 500GB Uncharted 4: A Thief's End Bundle color negro azabache",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-slim-500gb-uncharted-4-a-thiefs-end-bundle-color-negro-azabache/p/MLA6290735#polycard_client=search-nordic&search_layout=stack&position=36&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1560602207&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$698.270",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:21"
+    },
+    {
+      "producto_id": "f7748c98",
+      "producto_titulo": "Sony PlayStation 3 Super Slim 500GB Standard Color Charcoal Black - Excelente (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-3-super-slim-500gb-standard-color-charcoal-black-excelente-reacondicionado/p/MLA2013748315#polycard_client=search-nordic&search_layout=stack&position=37&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1510698761&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$353.876",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:24"
+    },
+    {
+      "producto_id": "33b787c6",
+      "producto_titulo": "Consola Playstation 5 Slim Digital 1tb +fc 26 Dig Soy Gamer - Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-playstation-5-slim-digital-1tb-fc-26-dig-soy-gamer/up/MLAU1317646163#polycard_client=search-nordic&search_layout=stack&position=38&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1913292536&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$1.480.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:27"
+    },
+    {
+      "producto_id": "e078e665",
+      "producto_titulo": "Reproductor Remoto Sony Playstation Portal Negro",
+      "producto_link": "https://www.mercadolibre.com.ar/reproductor-remoto-sony-playstation-portal-negro/p/MLA47405441#polycard_client=search-nordic&search_layout=stack&position=39&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2195174858&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$563.959",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:30"
+    },
+    {
+      "producto_id": "99a11fc9",
+      "producto_titulo": "Sony PlayStation Portal CFI-Y100130 6GB 30° Aniversario Edición limitada color gris 2024",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-portal-cfi-y100130-6gb-30-aniversario-edicion-limitada-color-gris-2024/p/MLA42027157#polycard_client=search-nordic&search_layout=stack&position=40&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1474335477&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$729.999",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:33"
+    },
+    {
+      "producto_id": "2e4aa51e",
+      "producto_titulo": "Sony PlayStation 4 Slim 500GB Standard PS4",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-slim-500gb-standard-ps4/p/MLA10813731#polycard_client=search-nordic&search_layout=stack&position=41&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1407398278&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$593.310",
+      "resumen_ia": "La consola es un producto excelente y altamente recomendable por su calidad y precio. Funciona perfectamente y cumple con las especificaciones esperadas.",
+      "timestamp_extraccion": "2025-11-06 00:10:36"
+    },
+    {
+      "producto_id": "4f4ec961",
+      "producto_titulo": "Sony Playstation 5 Slim Digital 1tb Spiderman 2 + Control Dualsense",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-5-slim-digital-1tb-spiderman-2-control-dualsense/p/MLA37369428#polycard_client=search-nordic&search_layout=stack&position=42&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1570760297&sid=search",
+      "producto_calificacion": 4.9,
+      "producto_precio": "$1.200.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:39"
+    },
+    {
+      "producto_id": "297e095f",
+      "producto_titulo": "Sony PlayStation 4 500GB Uncharted: The Nathan Drake Collection Bundle color negro azabache",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-4-500gb-uncharted-the-nathan-drake-collection-bundle-color-negro-azabache/p/MLA14338638#polycard_client=search-nordic&search_layout=stack&position=43&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1516710895&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$759.999",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:42"
+    },
+    {
+      "producto_id": "6a5848ec",
+      "producto_titulo": "Sony Consola Ps5 1tb Slim Con Lectora De Disco Color Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-consola-ps5-1tb-slim-con-lectora-de-disco-color-blanco/p/MLA46191166#polycard_client=search-nordic&search_layout=stack&position=44&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2480510422&sid=search",
+      "producto_calificacion": 4.8,
+      "producto_precio": "$1.100.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:45"
+    },
+    {
+      "producto_id": "95e54bac",
+      "producto_titulo": "Sony PlayStation 3 Slim Hd500gb 320GB Standard color charcoal black 2010 - Excelente (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-3-slim-hd500gb-320gb-standard-color-charcoal-black-2010-excelente-reacondicionado/p/MLA2013747875#polycard_client=search-nordic&search_layout=stack&position=45&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2178123840&sid=search",
+      "producto_calificacion": 4.5,
+      "producto_precio": "$357.515",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:47"
+    },
+    {
+      "producto_id": "5e55766f",
+      "producto_titulo": "Consola Ps5 Slim Lectora +  Fc 26 Ps5 Soy Gamer - Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-ps5-slim-lectora---fc-26-ps5-soy-gamer/up/MLAU1689195820#polycard_client=search-nordic&search_layout=stack&position=46&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1452524319&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$1.590.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:50"
+    },
+    {
+      "producto_id": "5327d484",
+      "producto_titulo": "Sony Playstation 5 Slim Digital Ps5 De 1 Tb, Color Blanco",
+      "producto_link": "https://www.mercadolibre.com.ar/playstation-5-slim-digital-1tb-blanco-cfi-2014b01x/p/MLA2038195393#polycard_client=search-nordic&search_layout=stack&position=47&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1566470031&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$761.004",
+      "resumen_ia": "El producto es de excelente calidad y muy recomendable. Ofrece una experiencia de juego mejorada, especialmente al pasar de una versión anterior como la. Además, su precio es considerado inmejorable para las características que ofrece.",
+      "timestamp_extraccion": "2025-11-06 00:10:53"
+    },
+    {
+      "producto_id": "1b82847d",
+      "producto_titulo": "Ps5 Portal_midnight_black Cfi-y1001",
+      "producto_link": "https://www.mercadolibre.com.ar/ps5-portalmidnightblack-cfiy1001/up/MLAU3306438900#polycard_client=search-nordic&search_layout=stack&position=48&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2186352642&sid=search",
+      "producto_calificacion": 5.0,
+      "producto_precio": "$642.999",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:56"
+    },
+    {
+      "producto_id": "5502d649",
+      "producto_titulo": "Sony Playstation 3 250gb + 15 Juegos Color Gris Oscuro - Excelente (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/sony-playstation-3-250gb-15-juegos-color-gris-oscuro-excelente-reacondicionado/p/MLA2014107906#polycard_client=search-nordic&search_layout=stack&position=49&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA1554445975&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$379.999",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:10:59"
+    },
+    {
+      "producto_id": "a3ff5d2a",
+      "producto_titulo": "Consola Sony Playstation 4 Slim 500gb + 2 Joystick + 1 Juego - Negro (Reacondicionado)",
+      "producto_link": "https://www.mercadolibre.com.ar/consola-sony-playstation-4-slim-500gb--2-joystick--1-juego/up/MLAU3419971105#polycard_client=search-nordic&search_layout=stack&position=50&type=product&tracking_id=8044bca1-8822-4f16-a64f-9890ca691773&wid=MLA2357309996&sid=search",
+      "producto_calificacion": 0.0,
+      "producto_precio": "$565.000",
+      "resumen_ia": null,
+      "timestamp_extraccion": "2025-11-06 00:11:02"
+    }
+  ]
+}

@@ -263,12 +263,12 @@ def ejecutar_analisis_resenias(archivo_productos):
     """Ejecuta el análisis de reseñas usando analizar_resenias_ia.py"""
     import subprocess
     try:
-        # Ejecutar script de análisis de reseñas
+        # Ejecutar script de análisis de reseñas (versión simplificada - solo resumen IA)
         result = subprocess.run(
             ['python', 'analizar_resenias_ia.py', archivo_productos],
             capture_output=True,
             text=True,
-            timeout=600  # 10 minutos timeout (puede ser largo)
+            timeout=300  # 5 minutos timeout (más rápido ahora sin opiniones individuales)
         )
         
         if result.returncode == 0:
@@ -282,7 +282,7 @@ def ejecutar_analisis_resenias(archivo_productos):
         else:
             return False, None, f"Error en análisis: {result.stderr}"
     except subprocess.TimeoutExpired:
-        return False, None, "Timeout: El análisis tomó demasiado tiempo (>10 min)"
+        return False, None, "Timeout: El análisis tomó demasiado tiempo (>5 min)"
     except Exception as e:
         return False, None, f"Error inesperado: {str(e)}"
 
@@ -393,7 +393,7 @@ def main():
                     
                     # Paso 2: Análisis de reseñas (si está marcado)
                     if analizar_resenias_checkbox:
-                        with st.spinner(f"🤖 Analizando reseñas... (puede tomar 5-10 min)"):
+                        with st.spinner(f"🤖 Analizando reseñas... (puede tomar 2-5 min)"):
                             exito_analisis, archivo_analisis_nuevo, mensaje_analisis = ejecutar_analisis_resenias(archivo_productos_nuevo)
                             
                             if exito_analisis:
@@ -694,89 +694,92 @@ def main():
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
     
-    # CHATBOT IA - Widget Flotante
+    # CHATBOT IA - Widget Flotante (al final de la página)
+    st.markdown("---")
+    st.markdown("## 🤖 Asistente IA - Data Analyst")
+    
     # Inicializar estado del chat
     if "chat_abierto" not in st.session_state:
         st.session_state.chat_abierto = False
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
-    # Crear el widget flotante usando popover (nativo de Streamlit)
     if groq_client:
-        # Crear contenedor flotante en la esquina inferior derecha
-        with st.sidebar:
-            st.markdown("---")
-            st.markdown("### 💬 Chat con IA")
-            
-            # Toggle para abrir/cerrar chat
-            chat_expandido = st.checkbox("Abrir Asistente IA", value=st.session_state.chat_abierto, key="toggle_chat")
+        # Toggle para abrir/cerrar chat
+        col_chat1, col_chat2 = st.columns([3, 1])
+        with col_chat1:
+            st.markdown("**Pregunta al asistente sobre productos, precios, opiniones y estrategias de mercado**")
+        with col_chat2:
+            chat_expandido = st.checkbox("Abrir Chat", value=st.session_state.chat_abierto, key="toggle_chat")
             st.session_state.chat_abierto = chat_expandido
+        
+        if chat_expandido:
+            # Prompts sugeridos en columnas
+            st.markdown("##### 💬 Prompts Sugeridos:")
+            col1, col2, col3, col4 = st.columns(4)
             
-            if chat_expandido:
-                st.markdown("**🤖 Data Analyst - Mercado Libre**")
-                st.caption("Pregúntame sobre los productos, precios, opiniones y estrategias de mercado")
-                
-                # Prompts sugeridos (botones más pequeños)
-                st.markdown("##### Prompts Sugeridos:")
-                
-                if st.button("💡 Avatar de Cliente Ideal", use_container_width=True):
+            with col1:
+                if st.button("💡 Avatar de Cliente", use_container_width=True):
                     st.session_state.prompt_sugerido = "Analiza todas las opiniones para crear un avatar de cliente ideal con características demográficas, psicográficas y necesidades específicas"
-                
+            
+            with col2:
                 if st.button("💰 Estrategia de Precio", use_container_width=True):
                     st.session_state.prompt_sugerido = "Sugerime una estrategia para encontrar el mejor precio de venta del producto analizado basado en la competencia y la percepción de valor"
-                
-                if st.button("📊 Explica los Insights", use_container_width=True):
+            
+            with col3:
+                if st.button("📊 Explica Insights", use_container_width=True):
                     st.session_state.prompt_sugerido = "Explícame los insights más importantes de estos datos desde una perspectiva de marketing y ventas"
-                
-                if st.button("⭐ Análisis de Opiniones", use_container_width=True):
+            
+            with col4:
+                if st.button("⭐ Análisis Opiniones", use_container_width=True):
                     st.session_state.prompt_sugerido = "Resume los puntos principales de las opiniones de clientes, tanto positivos como negativos"
-                
-                st.markdown("---")
-                
-                # Historial de mensajes (scrollable)
-                chat_container = st.container(height=300)
-                with chat_container:
-                    for message in st.session_state.messages:
-                        with st.chat_message(message["role"]):
-                            st.markdown(message["content"])
-                
-                # Input de chat
-                if "prompt_sugerido" in st.session_state:
-                    prompt = st.session_state.prompt_sugerido
-                    del st.session_state.prompt_sugerido
-                else:
-                    prompt = st.chat_input("Escribe tu pregunta...", key="chat_input_widget")
-                
-                # Procesar nuevo mensaje
-                if prompt:
-                    # Agregar mensaje del usuario
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                    
-                    # Generar respuesta con spinner
-                    with st.spinner("🧠 Analizando datos..."):
-                        response = analizar_con_ia(
-                            prompt, 
-                            df_filtrado, 
-                            groq_client,
-                            json_productos_completo,
-                            json_analisis_completo
-                        )
-                        st.session_state.messages.append({"role": "assistant", "content": response})
-                    
-                    # Rerun para mostrar los nuevos mensajes
-                    st.rerun()
-                
-                # Botón para limpiar historial
-                if len(st.session_state.messages) > 0:
-                    if st.button("🗑️ Limpiar Chat", use_container_width=True):
-                        st.session_state.messages = []
-                        st.rerun()
-    else:
-        with st.sidebar:
+            
             st.markdown("---")
-            st.warning("⚠️ Chatbot IA no disponible")
-            st.info("Configura `GROQ_API_KEY` para usar el asistente de IA")
-            st.caption("Obtén tu API key en: https://console.groq.com/")
+            
+            # Historial de mensajes (scrollable)
+            chat_container = st.container(height=400)
+            with chat_container:
+                if len(st.session_state.messages) == 0:
+                    st.info("👋 ¡Hola! Soy tu asistente de análisis de datos. Pregúntame lo que quieras sobre los productos.")
+                
+                for message in st.session_state.messages:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
+            
+            # Input de chat
+            if "prompt_sugerido" in st.session_state:
+                prompt = st.session_state.prompt_sugerido
+                del st.session_state.prompt_sugerido
+            else:
+                prompt = st.chat_input("Escribe tu pregunta aquí...", key="chat_input_widget")
+            
+            # Procesar nuevo mensaje
+            if prompt:
+                # Agregar mensaje del usuario
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                
+                # Generar respuesta con spinner
+                with st.spinner("🧠 Analizando datos..."):
+                    response = analizar_con_ia(
+                        prompt, 
+                        df_filtrado, 
+                        groq_client,
+                        json_productos_completo,
+                        json_analisis_completo
+                    )
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                
+                # Rerun para mostrar los nuevos mensajes
+                st.rerun()
+            
+            # Botón para limpiar historial
+            if len(st.session_state.messages) > 0:
+                if st.button("🗑️ Limpiar Chat"):
+                    st.session_state.messages = []
+                    st.rerun()
+    else:
+        st.warning("⚠️ Chatbot IA no disponible")
+        st.info("Configura `GROQ_API_KEY` para usar el asistente de IA. Obtén tu API key en: https://console.groq.com/")
     
     # Footer
     st.markdown("---")

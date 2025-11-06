@@ -30,7 +30,7 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 - 📋 **Dos hojas**: Productos + Resumen con estadísticas
 - 📏 **Formato automático**: Anchos de columna ajustados
 
-### 📊 Dashboard Interactivo (dashboard_productos_v4.py) ⭐ ACTUALIZADO v4.2
+### 📊 Dashboard Interactivo (dashboard_productos_v4.py) ⭐ ACTUALIZADO v4.3
 - 📊 **Cards de métricas**: Min, Median, Max precio, Total productos
 - 📋 **Tabla mejorada**: 
   - ✅ Resumen IA (join corregido: productos.id ↔ análisis.producto_id)
@@ -48,16 +48,21 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 - 📊 **Gráfico barras**: Precio promedio por calificación
 - 🥧 **Gráfico torta**: Marcas más populares (Top 10)
 - 🎚️ **Filtros dinámicos**: Marca, envío, categoría, calificación
-- 🤖 **Chatbot IA Mejorado**: Widget en sidebar con Groq + LLama-3.3-70b
-  - 💬 Minimizable/Expandible (ahorra espacio)
+- 🤖 **Chatbot IA Mejorado**: Widget al final de la página con Groq + LLama-3.3-70b ✨ v4.3
+  - 📍 Ubicación: Final de la página (antes del footer)
+  - 💬 Expandible con checkbox
   - 🧠 Acceso completo a JSONs de productos y reseñas
-  - 📊 4 Prompts sugeridos (Avatar Cliente, Estrategia Precio, Insights, Opiniones)
-  - 💾 Historial scrollable + botón de limpieza
+  - 📊 4 Prompts sugeridos en fila horizontal
+  - 💾 Historial scrollable (400px) + botón de limpieza
   - 🎯 Análisis proactivo en lenguaje marketinero
+- ⚡ **Análisis Simplificado**: Solo extrae resumen IA (80% más rápido) ✨ v4.3
+  - ⏱️ 2-5 minutos (antes: 10+ minutos)
+  - ✅ Sin Selenium (más confiable)
+  - 🎯 Solo resumen IA (sin opiniones individuales)
 
 ## 🚀 Uso Rápido
 
-### 🎯 Opción 1: Búsqueda desde el Dashboard (v4.2) ⭐ RECOMENDADO
+### 🎯 Opción 1: Búsqueda desde el Dashboard (v4.3) ⭐ RECOMENDADO
 
 ```bash
 # 1. Ejecutar Dashboard
@@ -68,7 +73,7 @@ streamlit run dashboard_productos_v4.py
 #    - Escribir nombre del producto (ej: "ipad pro")
 #    - Marcar/Desmarcar "Incluir reseñas"
 #    - Click "🔍 Buscar"
-#    - Esperar a que termine el scraping
+#    - Esperar ~30-60 seg (productos) + ~2-5 min (reseñas, opcional)
 #    - Click "🔄 Recargar Dashboard"
 
 # 3. ¡Listo! Los datos ya están en la tabla
@@ -90,9 +95,9 @@ streamlit run dashboard_productos_v4.py
 python test_dashboard_v4.py
 ```
 
-**Ver [CHANGELOG_V4.2.md](CHANGELOG_V4.2.md) para detalles de la última actualización** ⭐
+**Ver [FIX_TIMEOUT_FINAL.md](FIX_TIMEOUT_FINAL.md) para el fix definitivo del timeout** ⭐ **v4.3.1 - NUEVO**
 
-**🔧 Fix EOFError**: Si encuentras el error `EOFError` al ejecutar análisis de reseñas desde el dashboard, consulta [FIX_EOFERROR_ANALISIS.md](FIX_EOFERROR_ANALISIS.md) ✅
+**📋 Changelogs anteriores**: [CAMBIOS_V4.3_SIMPLIFICACION.md](CAMBIOS_V4.3_SIMPLIFICACION.md) | [CHANGELOG_V4.2.md](CHANGELOG_V4.2.md) | [FIX_EOFERROR_ANALISIS.md](FIX_EOFERROR_ANALISIS.md)
 
 ### Opción 1: Modo Interactivo
 
