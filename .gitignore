@@ -1,7 +1,52 @@
-__pycache__
-.pytest_cache/
+# Archivos y directorios ignorados por Git
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# Virtual environments
 .venv/
-.venv_new
-backup/
-documentacion/
+.venv_new/
+env/
+venv/
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*~
+*.bak
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Dependencias (si se instalan localmente fuera del venv)
+pip-wheel-metadata/
+.pip-modules/
+
+# Python application-specific ignores
+*.log
+*.sqlite3
+*.db
+
+# Archivos de configuración y secretos
 .env
+
+# Streamlit specific (si no se quieren versionar las caches u otros archivos)
+.streamlit/
+
+# Archivos de datos generados por el proyecto
+productos/
+resenias/
+
+# Archivos de test (caches, logs, etc.)
+.pytest_cache/
+
+# Documentación o archivos de troubleshooting específicos que no son parte del core del repo
+FIX_PLOTLY_ERROR.md
