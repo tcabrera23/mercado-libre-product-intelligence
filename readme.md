@@ -2,6 +2,29 @@
 
 Sistema completo para extraer, analizar y visualizar información de productos de Mercado Libre Argentina.
 
+## 🐳 Nuevo: Soporte Docker + Ollama
+
+¡Ahora puedes ejecutar el proyecto con **Docker** y usar modelos locales con **Ollama** (además de Groq)!
+
+- ✅ **Sin complicaciones**: Un solo comando para levantar todo
+- ✅ **Modelos locales**: Ollama con llama3.2, mistral, etc.
+- ✅ **Gratis**: No requiere API keys (aunque Groq sigue disponible)
+- ✅ **Carpetas organizadas**: Los JSON se guardan en `productos/` y `resenias/`
+
+### Inicio Rápido con Docker:
+
+```bash
+# Levantar servicios (app + Ollama)
+docker-compose up -d
+
+# Descargar modelo de Ollama
+docker exec -it analisis-productos-ollama ollama pull llama3.2:8b
+
+# Abrir en navegador: http://localhost:8501
+```
+
+📖 **[Ver guía completa de Docker →](DOCKER_SETUP.md)**
+
 ## 📋 Descripción
 
 Este proyecto permite buscar cualquier producto en Mercado Libre, extraer automáticamente su información (precios, calificaciones, envíos, etc.) y guardarla en formato JSON para su posterior análisis.
@@ -16,11 +39,9 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 - 💾 **Export a JSON**: Guarda los resultados con timestamp
 - 🎯 **ID único**: Cada producto recibe un identificador único
 
-### 🤖 Análisis de Reseñas (analizar_resenias_ia_v2.py) ⭐ NUEVO v3.0
-- 🌐 **Selenium**: Filtrado dinámico con interacción real
-- 🎯 **Filtro automático**: Click en opiniones de 1 estrella
+### 🤖 Análisis de Reseñas (analizar_resenias_ia.py) ⭐ ACTUALIZADO v3.0
+- 🌐 **Web Scraping**: Extrae opiniones de productos de Mercado Libre
 - 🤖 **Resumen de IA**: Extrae el resumen generado por IA de ML
-- ⭐ **Top 5 negativas**: Reseñas de 1 estrella filtradas
 - 💾 **JSON estructurado**: Listo para análisis
 
 ### 📊 Export a Excel (export_to_excel.py) ⭐ NUEVO v3.0
@@ -48,7 +69,8 @@ Este proyecto permite buscar cualquier producto en Mercado Libre, extraer autom�
 - 📊 **Gráfico barras**: Precio promedio por calificación
 - 🥧 **Gráfico torta**: Marcas más populares (Top 10)
 - 🎚️ **Filtros dinámicos**: Marca, envío, categoría, calificación
-- 🤖 **Chatbot IA Mejorado**: Widget al final de la página con Groq + LLama-3.3-70b ✨ v4.3
+- 🤖 **Chatbot IA con múltiples proveedores**: ⭐ **NUEVO v5.0**
+  - 🔄 **Groq** (API en la nube, rápido) o **Ollama** (local, gratis, privado)
   - 📍 Ubicación: Final de la página (antes del footer)
   - 💬 Expandible con checkbox
   - 🧠 Acceso completo a JSONs de productos y reseñas
@@ -121,57 +143,89 @@ python buscar_productos_ml.py "notebook gaming"
 Analisis de Productos/
 │
 ├── 🎯 Scripts Principales
-│   ├── buscar_productos_ml.py      # ⭐ Extracción de productos
-│   └── analizar_resenias_ia.py     # ⭐ Análisis de reseñas (NUEVO v2.0)
+│   ├── buscar_productos_ml.py       # ⭐ Extracción de productos
+│   ├── analizar_resenias_ia.py      # ⭐ Análisis de reseñas
+│   ├── dashboard_productos.py       # Dashboard interactivo (versión base/simplificada)
+│   ├── dashboard_productos_v4.py    # ⭐ Dashboard interactivo con IA (versión principal)
+│   └── llm_config.py                # 🆕 Configuración LLM (Groq/Ollama)
 │
 ├── 🔧 Funciones y Utilidades
-│   ├── get_html.py                 # Función para obtener HTML de ML
-│   └── ejemplo_uso.py              # Ejemplos avanzados
+│   ├── parse_html/get_html.py       # Función para obtener HTML de ML
+│   ├── export_to_excel.py           # Exportar a Excel
+│   └── ejemplo_uso.py               # Ejemplos avanzados
+│
+├── 🐳 Docker
+│   ├── Dockerfile                   # 🆕 Imagen de la app
+│   ├── docker-compose.yml           # 🆕 Orquestación (app + Ollama)
+│   └── DOCKER_SETUP.md              # 🆕 Guía completa de Docker
 │
 ├── 📚 Documentación
-│   ├── README.md                   # Este archivo
-│   ├── DEMO_V2.0.md               # ⭐ Guía completa v2.0
-│   ├── GUIA_RAPIDA.md             # Tutorial rápido
-│   ├── INICIO.md                   # Punto de entrada
-│   └── CHANGELOG.md                # Historial de cambios
+│   ├── README.md                    # Este archivo
+│   ├── INICIO.md                    # Punto de entrada
+│   └── documentacion/               # Changelogs y guías
 │
-├── 📄 Datos Generados
-│   ├── productos_*.json            # Productos extraídos
-│   └── analisis_resenias_*.json   # Análisis de reseñas (NUEVO)
+├── 📄 Datos Generados (Organizados en carpetas)
+│   ├── productos/                   # 🆕 JSONs de productos
+│   │   └── productos_*.json
+│   └── resenias/                    # 🆕 JSONs de análisis de reseñas
+│       └── analisis_resenias_*.json
 │
-└── 💾 Backup
-    ├── get_products.py             # Script original (legacy)
-    └── get_resenias.py             # Versión anterior
+├── ⚙️ Configuración
+│   ├── env.example                  # 🆕 Plantilla de variables de entorno
+│   ├── requirements.txt             # Dependencias Python
+│   └── .gitignore
+│
+└── 💾 Backup y Tests
+    ├── backup/                      # Scripts legacy
+    └── tests/                       # Tests del proyecto
 ```
 
 ## 🛠️ Instalación
+
+### Opción 1: Docker (Recomendado) 🐳
+
+```bash
+# 1. Levantar servicios
+docker-compose up -d
+
+# 2. Descargar modelo de Ollama
+docker exec -it analisis-productos-ollama ollama pull llama3.2:8b
+
+# 3. Abrir http://localhost:8501
+```
+
+📖 **[Ver guía completa de Docker →](DOCKER_SETUP.md)**
+
+### Opción 2: Instalación Local
 
 1. **Clonar o descargar el proyecto**
 
 2. **Instalar dependencias:**
 
 ```bash
-# Dependencias básicas (scraping)
-pip install requests beautifulsoup4
-
-# Dependencias completas (incluye dashboard y chatbot IA)
+# Dependencias completas
 pip install -r requirements.txt
 ```
 
-3. **Configurar API Key de Groq** (opcional, solo para chatbot IA):
+3. **Configurar variables de entorno** (opcional):
 
 ```bash
-# Windows PowerShell
-$env:GROQ_API_KEY="tu_api_key_aqui"
+# Copiar archivo de ejemplo
+cp env.example .env
 
-# Windows CMD
-set GROQ_API_KEY=tu_api_key_aqui
-
-# Linux/Mac
-export GROQ_API_KEY=tu_api_key_aqui
+# Editar .env con tu configuración:
+# - GROQ_API_KEY (para Groq)
+# - OLLAMA_BASE_URL (para Ollama local)
 ```
 
-💡 **Obtén tu API key gratis en**: https://console.groq.com/
+**Para usar Groq:**
+- Obtén tu API key gratis en: https://console.groq.com/
+- Configura `GROQ_API_KEY` en `.env`
+
+**Para usar Ollama:**
+- Instala Ollama: https://ollama.ai
+- Ejecuta: `ollama pull llama3.2:8b`
+- Configura `OLLAMA_BASE_URL=http://localhost:11434` en `.env`
 
 4. **Ejecutar:**
 
@@ -179,7 +233,7 @@ export GROQ_API_KEY=tu_api_key_aqui
 # Extracción de productos
 python buscar_productos_ml.py "producto deseado"
 
-# Dashboard interactivo (v4.1)
+# Dashboard interactivo
 streamlit run dashboard_productos_v4.py
 ```
 
@@ -211,7 +265,7 @@ El programa genera un archivo JSON con el siguiente formato:
 
 ## 🔧 Módulos
 
-### `get_html.py`
+### `parse_html/get_html.py`
 Contiene la función `obtener_html_mercadolibre()` que:
 - Recibe el nombre del producto
 - Construye la URL de búsqueda
@@ -220,14 +274,17 @@ Contiene la función `obtener_html_mercadolibre()` que:
 
 ### `buscar_productos_ml.py`
 Script principal que:
-- Usa `get_html.py` para obtener el HTML
+- Usa `parse_html/get_html.py` para obtener el HTML
 - Extrae información de cada producto
 - Genera IDs únicos
 - Guarda resultados en JSON
 - Muestra resumen en consola
 
-### `get_resenias.py`
-Para extraer reseñas de productos específicos.
+### `analizar_resenias_ia.py`
+Script principal que:
+- Usa `parse_html/get_html.py` para obtener el HTML de la página de reseñas (a través de `requests`)
+- Extrae el resumen generado por IA de Mercado Libre.
+- Guarda los resultados en JSON.
 
 ## 💡 Ejemplos de Búsqueda
 
@@ -276,7 +333,7 @@ python buscar_productos_ml.py "cafetera nespresso"
 
 ### Error de timeout
 - El timeout está configurado en 15 segundos
-- Si tu conexión es lenta, puedes aumentarlo en `get_html.py`
+- Si tu conexión es lenta, puedes aumentarlo en `parse_html/get_html.py`
 
 ## 📝 Notas
 
@@ -286,6 +343,8 @@ Este proyecto fue creado con fines educativos para análisis de mercado y compar
 
 Ideas y mejoras son bienvenidas!
 
+Autor: Tomas Cabrera
+
 ---
 
-**Última actualización**: Noviembre 2024
+**Última actualización**: Enero 2026

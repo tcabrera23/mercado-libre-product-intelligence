@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime
 import sys
 import io
+import os
 
 # Configurar encoding UTF-8 para Windows
 if sys.platform == 'win32':
@@ -23,7 +24,7 @@ if sys.platform == 'win32':
         pass  # Si falla, continuar sin emojis
 
 # Importar la función para obtener HTML de Mercado Libre
-from get_html import obtener_html_mercadolibre
+from parse_html.get_html import obtener_html_mercadolibre
 
 
 def extraer_productos_con_id(html_section):
@@ -149,7 +150,7 @@ def extraer_productos_con_id(html_section):
 
 def guardar_productos(productos, nombre_producto):
     """
-    Guarda los productos en un archivo JSON
+    Guarda los productos en un archivo JSON en la carpeta productos/
     
     Args:
         productos: Lista de productos
@@ -159,9 +160,16 @@ def guardar_productos(productos, nombre_producto):
         print("❌ No hay productos para guardar")
         return None
     
+    # Crear carpeta productos/ si no existe
+    carpeta_productos = "productos"
+    if not os.path.exists(carpeta_productos):
+        os.makedirs(carpeta_productos)
+        print(f"📁 Carpeta '{carpeta_productos}/' creada")
+    
     # Crear nombre de archivo con timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     nombre_archivo = f"productos_{nombre_producto.replace(' ', '_')}_{timestamp}.json"
+    ruta_completa = os.path.join(carpeta_productos, nombre_archivo)
     
     # Preparar datos para guardar
     datos = {
@@ -173,11 +181,11 @@ def guardar_productos(productos, nombre_producto):
     
     # Guardar en JSON
     try:
-        with open(nombre_archivo, 'w', encoding='utf-8') as f:
+        with open(ruta_completa, 'w', encoding='utf-8') as f:
             json.dump(datos, f, indent=2, ensure_ascii=False)
         
-        print(f"\n💾 Archivo guardado exitosamente: {nombre_archivo}")
-        return nombre_archivo
+        print(f"\n💾 Archivo guardado exitosamente: {ruta_completa}")
+        return ruta_completa
     except Exception as e:
         print(f"\n❌ Error al guardar archivo: {e}")
         return None

@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs y backups
+backup/
+documentacion/
+tests/
+*.md
+!README.md
+!DOCKER_SETUP.md
+
+# Datos de ejemplo (opcional, descomentar si quieres incluirlos)
+# productos/*.json
+# resenias/*.json

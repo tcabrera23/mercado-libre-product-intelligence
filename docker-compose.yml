@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Servicio de Ollama (LLM local)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: analisis-productos-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  
+  # Servicio de la aplicación Streamlit
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: analisis-productos-app
+    ports:
+      - "8501:8501"
+    volumes:
+      # Montar carpetas de datos para persistencia
+      - ./productos:/app/productos
+      - ./resenias:/app/resenias
+      # Montar código para desarrollo (opcional, comentar en producción)
+      - .:/app
+    environment:
+      # Configuración de Ollama (apuntar al servicio)
+      - OLLAMA_BASE_URL=http://ollama:11434
+      # Configuración de Groq (opcional, usar tu API key)
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+    driver: local

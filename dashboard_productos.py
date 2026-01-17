@@ -1,6 +1,6 @@
 """
-Dashboard interactivo para análisis de productos de Mercado Libre
-Creado con Streamlit
+Dashboard interactivo v4.0 para análisis de productos de Mercado Libre
+Con Chatbot IA integrado (Groq + LLama / Ollama)
 """
 
 import streamlit as st
@@ -10,10 +10,16 @@ import plotly.graph_objects as go
 import json
 import os
 from datetime import datetime
+import io
+from llm_config import get_llm_provider, list_ollama_models
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env
+load_dotenv()
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Dashboard Productos ML",
+    page_title="Dashboard Productos ML v4",
     page_icon="🛒",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -32,11 +38,54 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 2rem;
     }
-    .metric-card {
-        background-color: #f0f2f6;
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 5px solid #3483FA;
+    
+    /* Chat Widget Styles */
+    .chat-widget-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        transition: transform 0.3s ease;
+    }
+    
+    .chat-widget-button:hover {
+        transform: scale(1.1);
+    }
+    
+    .chat-widget-container {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 400px;
+        max-height: 600px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        z-index: 998;
+        overflow: hidden;
+    }
+    
+    .chat-widget-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .stChatFloatingInputContainer {
+        bottom: 90px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -69,15 +118,29 @@ def extraer_marca(titulo):
     return titulo.split()[0] if titulo.split() else "Sin marca"
 
 
-def extraer_cantidad_vendidos(vendidos_str):
-    """Extrae número de vendidos del string"""
+def extraer_numero_vendidos(vendidos_str):
+    """Extrae número de vendidos para ordenamiento"""
+    if pd.isna(vendidos_str) or vendidos_str == "Sin ventas":
+        return 0
     try:
-        if 'mil' in vendidos_str.lower():
-            numero = vendidos_str.replace('+', '').replace('mil', '').replace('vendidos', '').strip()
+        vendidos_lower = str(vendidos_str).lower()
+        if 'mil' in vendidos_lower:
+            numero = vendidos_lower.replace('+', '').replace('mil', '').replace('vendidos', '').strip()
             return float(numero) * 1000
         else:
-            numero = vendidos_str.replace('+', '').replace('vendidos', '').strip()
+            numero = vendidos_lower.replace('+', '').replace('vendidos', '').strip()
             return float(numero)
+    except:
+        return 0
+
+
+def extraer_numero_descuento(descuento_str):
+    """Extrae número de descuento para ordenamiento"""
+    if pd.isna(descuento_str) or descuento_str in ["", "0%", "No"]:
+        return 0
+    try:
+        numero = str(descuento_str).replace('%', '').replace('OFF', '').replace('off', '').strip()
+        return float(numero)
     except:
         return 0
 
@@ -93,53 +156,375 @@ def clasificar_precio(precio, promedio):
 
 
 @st.cache_data
-def cargar_datos(archivo_json):
-    """Carga y procesa los datos del JSON"""
-    with open(archivo_json, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+def cargar_datos(archivo_json_productos, archivo_json_analisis=None):
+    """Carga y procesa los datos del JSON, con join opcional de análisis"""
+    # Añadir carpeta productos/ si no tiene ruta
+    if not os.path.dirname(archivo_json_productos):
+        archivo_json_productos = os.path.join("productos", archivo_json_productos)
     
-    productos = data.get('productos', [])
+    # Cargar productos
+    with open(archivo_json_productos, 'r', encoding='utf-8') as f:
+        data_productos = json.load(f)
+    
+    productos = data_productos.get('productos', [])
     df = pd.DataFrame(productos)
     
-    # Procesar datos
+    # Procesar datos básicos
     df['precio_numerico'] = df['precio_actual'].apply(limpiar_precio)
     df['marca'] = df['titulo'].apply(extraer_marca)
-    df['cantidad_vendidos'] = df['vendidos'].apply(extraer_cantidad_vendidos)
+    df['cantidad_vendidos_num'] = df['vendidos'].apply(extraer_numero_vendidos)
+    df['descuento_num'] = df['descuento'].apply(extraer_numero_descuento)
     df['envio_gratis_texto'] = df['envio_gratis'].apply(lambda x: 'Sí' if x else 'No')
+    
+    # Normalizar descuento: si es vacío o 0%, mostrar "No"
+    df['descuento_mostrar'] = df['descuento'].apply(
+        lambda x: "No" if pd.isna(x) or x in ["", "0%"] else x
+    )
     
     # Clasificar por precio
     promedio = df['precio_numerico'].mean()
     df['categoria_precio'] = df['precio_numerico'].apply(lambda x: clasificar_precio(x, promedio))
     
-    return df, data.get('producto_buscado', 'Productos')
+    # JOIN con análisis de reseñas si existe
+    data_analisis_completo = None
+    if archivo_json_analisis:
+        # Añadir carpeta resenias/ si no tiene ruta
+        if not os.path.dirname(archivo_json_analisis):
+            archivo_json_analisis = os.path.join("resenias", archivo_json_analisis)
+        
+        if os.path.exists(archivo_json_analisis):
+            try:
+                with open(archivo_json_analisis, 'r', encoding='utf-8') as f:
+                    data_analisis_completo = json.load(f)
+                
+                df_analisis = pd.DataFrame(data_analisis_completo.get('productos', []))
+                if not df_analisis.empty and 'producto_id' in df_analisis.columns:
+                    # JOIN por 'id' (productos) con 'producto_id' (análisis)
+                    # Solo incluir las columnas que existen
+                    columnas_merge = ['producto_id', 'resumen_ia']
+                    if 'opiniones_1_estrella' in df_analisis.columns:
+                        columnas_merge.append('opiniones_1_estrella')
+                    
+                    df = df.merge(
+                        df_analisis[columnas_merge],
+                        left_on='id',
+                        right_on='producto_id',
+                        how='left'
+                    )
+                    # Eliminar columna duplicada producto_id
+                    if 'producto_id' in df.columns:
+                        df = df.drop(columns=['producto_id'])
+            except Exception as e:
+                st.warning(f"No se pudo cargar análisis de reseñas: {e}")
+    
+    # Si no hay resumen_ia (no se hizo merge o no matcheó), crear columna con None
+    if 'resumen_ia' not in df.columns:
+        df['resumen_ia'] = None
+    
+    # Rellenar NaN en resumen_ia con texto descriptivo
+    df['resumen_ia'] = df['resumen_ia'].fillna("Sin análisis disponible")
+    
+    # Retornar también los JSONs completos para el agente de IA
+    return df, data_productos.get('producto_buscado', 'Productos'), data_productos, data_analisis_completo
+
+
+def crear_excel_descargable(df_mostrar):
+    """Crea un archivo Excel en memoria para descargar"""
+    output = io.BytesIO()
+    
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_mostrar.to_excel(writer, sheet_name='Productos', index=False)
+        
+        # Ajustar anchos de columna
+        worksheet = writer.sheets['Productos']
+        for idx, col in enumerate(df_mostrar.columns, 1):
+            max_length = max(
+                df_mostrar[col].astype(str).apply(len).max(),
+                len(str(col))
+            )
+            max_length = min(max_length, 50)
+            worksheet.column_dimensions[chr(64 + idx)].width = max_length + 2
+    
+    output.seek(0)
+    return output
+
+
+def ejecutar_scraping_producto(producto_nombre):
+    """Ejecuta el scraping de productos usando buscar_productos_ml.py"""
+    import subprocess
+    try:
+        # Ejecutar script de búsqueda de productos
+        result = subprocess.run(
+            ['python', 'buscar_productos_ml.py', producto_nombre],
+            capture_output=True,
+            text=True,
+            timeout=120  # 2 minutos timeout
+        )
+        
+        if result.returncode == 0:
+            # Buscar el archivo JSON generado más reciente en carpeta productos/
+            carpeta_productos = "productos"
+            if os.path.exists(carpeta_productos):
+                archivos = [f for f in os.listdir(carpeta_productos) if f.startswith('productos_') and producto_nombre.replace(' ', '_') in f and f.endswith('.json')]
+                if archivos:
+                    archivos.sort(key=lambda x: os.path.getmtime(os.path.join(carpeta_productos, x)), reverse=True)
+                    return True, os.path.join(carpeta_productos, archivos[0]), "Productos extraídos exitosamente"
+            return False, None, "No se generó el archivo JSON"
+        else:
+            return False, None, f"Error en scraping: {result.stderr}"
+    except subprocess.TimeoutExpired:
+        return False, None, "Timeout: El scraping tomó demasiado tiempo"
+    except Exception as e:
+        return False, None, f"Error inesperado: {str(e)}"
+
+
+def ejecutar_analisis_resenias(archivo_productos):
+    """Ejecuta el análisis de reseñas usando analizar_resenias_ia.py"""
+    import subprocess
+    try:
+        # Ejecutar script de análisis de reseñas (versión simplificada - solo resumen IA)
+        result = subprocess.run(
+            ['python', 'analizar_resenias_ia.py', archivo_productos],
+            capture_output=True,
+            text=True,
+            timeout=300  # 5 minutos timeout (más rápido ahora sin opiniones individuales)
+        )
+        
+        if result.returncode == 0:
+            # Buscar el archivo JSON de análisis generado más reciente en carpeta resenias/
+            carpeta_resenias = "resenias"
+            if os.path.exists(carpeta_resenias):
+                archivos = [f for f in os.listdir(carpeta_resenias) if f.startswith('analisis_resenias_') and f.endswith('.json')]
+                if archivos:
+                    archivos.sort(key=lambda x: os.path.getmtime(os.path.join(carpeta_resenias, x)), reverse=True)
+                    return True, os.path.join(carpeta_resenias, archivos[0]), "Análisis de reseñas completado"
+            return False, None, "No se generó el archivo de análisis"
+        else:
+            return False, None, f"Error en análisis: {result.stderr}"
+    except subprocess.TimeoutExpired:
+        return False, None, "Timeout: El análisis tomó demasiado tiempo (>5 min)"
+    except Exception as e:
+        return False, None, f"Error inesperado: {str(e)}"
+
+
+def analizar_con_ia(prompt, df, llm_provider, json_productos=None, json_analisis=None):
+    """Analiza datos usando LLM (Groq/Ollama) con acceso a JSONs completos"""
+    try:
+        # Preparar contexto con estadísticas
+        stats = f"""
+Datos del Dashboard:
+- Total productos: {len(df)}
+- Precio promedio: ${df['precio_numerico'].mean():,.0f}
+- Precio mínimo: ${df['precio_numerico'].min():,.0f}
+- Precio máximo: ${df['precio_numerico'].max():,.0f}
+- Calificación promedio: {df['calificacion'].mean():.2f}
+- Productos con envío gratis: {len(df[df['envio_gratis']==True])}
+- Marcas principales: {', '.join(df['marca'].value_counts().head(5).index.tolist())}
+"""
+        
+        # Agregar información de reseñas si existe
+        if 'resumen_ia' in df.columns and df['resumen_ia'].notna().any():
+            resumenes = df[df['resumen_ia'].notna()]['resumen_ia'].head(3).tolist()
+            stats += f"\n\nEjemplos de Resúmenes de IA de ML:\n" + "\n".join([f"- {r[:200]}..." for r in resumenes if r])
+        
+        # Agregar contexto de JSONs completos si están disponibles
+        contexto_json = ""
+        if json_productos:
+            # Incluir algunos productos de ejemplo
+            productos_sample = json_productos.get('productos', [])[:5]
+            contexto_json += f"\n\nEjemplo de estructura de productos (primeros 5 de {len(json_productos.get('productos', []))}):\n"
+            contexto_json += json.dumps(productos_sample, ensure_ascii=False, indent=2)[:2000]
+        
+        if json_analisis:
+            # Incluir análisis completos disponibles
+            analisis_sample = json_analisis.get('productos', [])[:3]
+            contexto_json += f"\n\nEjemplo de análisis con opiniones (primeros 3 de {json_analisis.get('total_con_resumen_ia', 0)} con resumen):\n"
+            contexto_json += json.dumps(analisis_sample, ensure_ascii=False, indent=2)[:2000]
+        
+        system_prompt = """Eres un Data Analyst experto especializado en e-commerce y análisis de mercado.
+Analizas datos de productos de Mercado Libre con un enfoque marketinero y práctico.
+Tus análisis son concisos, accionables y orientados a resultados de negocio.
+Tienes acceso completo a los datos de productos y reseñas de clientes.
+Cuando te pregunten por la 'mejor relación calidad-precio', prioriza productos con:
+1. Calificación alta (idealmente 4.5 o más)
+2. Precio económico o mediano (según tu clasificación)
+3. Un resumen de IA disponible (si aplica, para entender el valor percibido).
+Cuando te preguntan sobre opiniones, puedes hacer referencia a los resúmenes generados por IA y las opiniones negativas (1 estrella).
+Cuando explicas insights, lo haces en lenguaje simple, con bullet points y orientado a decisiones de negocio."""
+
+        # Llamar a LLM API (Groq/Ollama)
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"{stats}{contexto_json}\n\nPregunta del usuario: {prompt}"}
+        ]
+        
+        response = llm_provider.chat_completion(messages)
+        return response
+    
+    except Exception as e:
+        return f"❌ Error al procesar con IA: {str(e)}"
 
 
 def main():
+    # === CONFIGURACIÓN DE PROVEEDOR LLM ===
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🤖 Configuración IA")
+    
+    # Selección de proveedor
+    llm_provider_name = st.sidebar.selectbox(
+        "Proveedor:",
+        ["groq", "ollama"],
+        help="Selecciona el proveedor de IA para el chatbot"
+    )
+    
+    llm_provider = None
+    llm_config_ok = False
+    
+    if llm_provider_name == "groq":
+        # Verificar API Key de Groq desde .env
+        groq_api_key = os.getenv("GROQ_API_KEY")
+        
+        if groq_api_key:
+            try:
+                llm_provider = get_llm_provider("groq", api_key=groq_api_key)
+                st.sidebar.success("✅ Groq configurado")
+                llm_config_ok = True
+            except Exception as e:
+                st.sidebar.error(f"❌ Error Groq: {e}")
+        else:
+            st.sidebar.warning("⚠️ GROQ_API_KEY no configurada en .env")
+            st.sidebar.info("1. Crea archivo .env en la raíz del proyecto")
+            st.sidebar.code("GROQ_API_KEY=tu_api_key_aqui", language="bash")
+            st.sidebar.info("2. Obtén tu API key en: https://console.groq.com/")
+    
+    elif llm_provider_name == "ollama":
+        # Configurar Ollama
+        ollama_url = st.sidebar.text_input(
+            "URL de Ollama:",
+            value=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+            help="URL donde está corriendo Ollama"
+        )
+        
+        try:
+            # Listar modelos disponibles
+            modelos_disponibles = list_ollama_models(ollama_url)
+            
+            if modelos_disponibles:
+                modelo_seleccionado = st.sidebar.selectbox(
+                    "Modelo:",
+                    modelos_disponibles,
+                    help="Selecciona el modelo de Ollama a usar"
+                )
+                
+                llm_provider = get_llm_provider(
+                    "ollama",
+                    base_url=ollama_url,
+                    model=modelo_seleccionado
+                )
+                st.sidebar.success(f"✅ Ollama configurado ({modelo_seleccionado})")
+                llm_config_ok = True
+            else:
+                st.sidebar.error("❌ No hay modelos en Ollama")
+                st.sidebar.info("Ejecuta: `ollama pull llama3.2:8b`")
+        except Exception as e:
+            st.sidebar.error(f"❌ Error Ollama: {e}")
+            st.sidebar.info("Verifica que Ollama esté corriendo")
+    
     # Header
-    st.markdown('<div class="main-header">🛒 Dashboard de Análisis de Productos</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🛒 Dashboard de Análisis de Productos v4.0</div>', unsafe_allow_html=True)
     
     # Sidebar - Cargar archivo
     st.sidebar.title("📁 Configuración")
     
-    # Listar archivos JSON disponibles
-    archivos_json = [f for f in os.listdir('.') if f.startswith('productos_') and f.endswith('.json')]
+    # === BARRA DE BÚSQUEDA EN TIEMPO REAL ===
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🔍 Búsqueda en Tiempo Real")
+    st.sidebar.caption("Busca un producto y obtén datos + reseñas")
     
-    if not archivos_json:
-        st.error("❌ No se encontraron archivos JSON de productos en el directorio actual")
-        st.info("💡 Ejecuta primero: `python buscar_productos_ml.py 'producto'`")
+    # Input de búsqueda
+    with st.sidebar.form(key="search_form", clear_on_submit=False):
+        producto_buscar = st.text_input(
+            "Nombre del producto:",
+            placeholder="ej: auriculares bluetooth",
+            help="Escribe el nombre del producto a buscar en Mercado Libre"
+        )
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            buscar_productos_btn = st.form_submit_button("🔍 Buscar", use_container_width=True)
+        with col2:
+            analizar_resenias_checkbox = st.checkbox("Incluir reseñas", value=True, help="Analizar reseñas (toma más tiempo)")
+    
+    # Procesar búsqueda
+    if buscar_productos_btn and producto_buscar:
+        with st.sidebar:
+            with st.spinner(f"🔍 Buscando '{producto_buscar}'..."):
+                # Paso 1: Scraping de productos
+                exito_productos, archivo_productos_nuevo, mensaje_productos = ejecutar_scraping_producto(producto_buscar)
+                
+                if exito_productos:
+                    st.success(f"✅ {mensaje_productos}")
+                    st.info(f"📄 Archivo: {archivo_productos_nuevo}")
+                    
+                    # Paso 2: Análisis de reseñas (si está marcado)
+                    if analizar_resenias_checkbox:
+                        with st.spinner(f"🤖 Analizando reseñas... (puede tomar 2-5 min)"):
+                            exito_analisis, archivo_analisis_nuevo, mensaje_analisis = ejecutar_analisis_resenias(archivo_productos_nuevo)
+                            
+                            if exito_analisis:
+                                st.success(f"✅ {mensaje_analisis}")
+                                st.info(f"📄 Archivo: {archivo_analisis_nuevo}")
+                            else:
+                                st.warning(f"⚠️ {mensaje_analisis}")
+                    
+                    st.success("🎉 ¡Búsqueda completada! Recarga la página o selecciona los nuevos archivos abajo.")
+                    st.button("🔄 Recargar Dashboard", on_click=lambda: st.rerun())
+                else:
+                    st.error(f"❌ {mensaje_productos}")
+    
+    st.sidebar.markdown("---")
+    
+    # Listar archivos JSON disponibles en carpetas productos/ y resenias/
+    carpeta_productos = "productos"
+    carpeta_resenias = "resenias"
+    
+    # Verificar que exista la carpeta productos
+    if not os.path.exists(carpeta_productos):
+        st.error("❌ No se encontró la carpeta 'productos/'")
+        st.info("💡 Ejecuta: `python buscar_productos_ml.py 'producto'`")
         return
     
-    archivo_seleccionado = st.sidebar.selectbox(
-        "Selecciona archivo JSON:",
-        archivos_json,
+    archivos_productos = [f for f in os.listdir(carpeta_productos) if f.startswith('productos_') and f.endswith('.json')]
+    
+    if not archivos_productos:
+        st.error("❌ No se encontraron archivos JSON de productos en 'productos/'")
+        st.info("💡 Ejecuta: `python buscar_productos_ml.py 'producto'`")
+        return
+    
+    archivo_productos = st.sidebar.selectbox(
+        "Archivo de productos:",
+        archivos_productos,
         index=0
     )
     
-    # Cargar datos
+    # Selector opcional de análisis
+    archivo_analisis = None
+    if os.path.exists(carpeta_resenias):
+        archivos_analisis = [f for f in os.listdir(carpeta_resenias) if f.startswith('analisis_resenias_') and f.endswith('.json')]
+        if archivos_analisis:
+            usar_analisis = st.sidebar.checkbox("Incluir análisis de reseñas", value=True)
+            if usar_analisis:
+                archivo_analisis = st.sidebar.selectbox(
+                    "Archivo de análisis:",
+                    archivos_analisis,
+                    index=0
+                )
+    
+    # Cargar datos (ahora retorna 4 valores: df, nombre_producto, json_productos, json_analisis)
     try:
-        df, producto_buscado = cargar_datos(archivo_seleccionado)
+        df, producto_buscado, json_productos_completo, json_analisis_completo = cargar_datos(archivo_productos, archivo_analisis)
     except Exception as e:
-        st.error(f"❌ Error al cargar el archivo: {e}")
+        st.error(f"❌ Error al cargar: {e}")
         return
     
     st.sidebar.success(f"✅ {len(df)} productos cargados")
@@ -150,10 +535,9 @@ def main():
     st.sidebar.subheader("🎚️ Filtros")
     
     # Filtro por marca
-    marcas_disponibles = ['Todas'] + sorted(df['marca'].unique().tolist())
     marca_filtro = st.sidebar.multiselect(
         "Marca:",
-        marcas_disponibles[1:],  # Sin 'Todas'
+        sorted(df['marca'].unique().tolist()),
         default=[]
     )
     
@@ -207,32 +591,17 @@ def main():
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric(
-            label="💰 Precio Mínimo",
-            value=f"${df_filtrado['precio_numerico'].min():,.0f}",
-            delta=None
-        )
+        st.metric("💰 Precio Mínimo", f"${df_filtrado['precio_numerico'].min():,.0f}")
     
     with col2:
-        st.metric(
-            label="💵 Precio Mediano",
-            value=f"${df_filtrado['precio_numerico'].median():,.0f}",
-            delta=None
-        )
+        st.metric("💵 Precio Mediano", f"${df_filtrado['precio_numerico'].median():,.0f}")
     
     with col3:
-        st.metric(
-            label="💸 Precio Máximo",
-            value=f"${df_filtrado['precio_numerico'].max():,.0f}",
-            delta=None
-        )
+        st.metric("💸 Precio Máximo", f"${df_filtrado['precio_numerico'].max():,.0f}")
     
     with col4:
-        st.metric(
-            label="📦 Total Productos",
-            value=f"{len(df_filtrado)}",
-            delta=f"{len(df_filtrado) - len(df)} filtrados" if len(df_filtrado) != len(df) else None
-        )
+        delta_text = f"{len(df_filtrado) - len(df)} filtrados" if len(df_filtrado) != len(df) else None
+        st.metric("📦 Total Productos", f"{len(df_filtrado)}", delta=delta_text)
     
     st.markdown("---")
     
@@ -240,24 +609,22 @@ def main():
     col_izq, col_der = st.columns(2)
     
     with col_izq:
-        # Gráfico de Dispersión: Precio vs Ventas
         st.markdown("### 📈 Relación Precio vs Ventas")
         st.caption("¿A menor precio, más ventas?")
         
-        df_scatter = df_filtrado[df_filtrado['cantidad_vendidos'] > 0].copy()
+        df_scatter = df_filtrado[df_filtrado['cantidad_vendidos_num'] > 0].copy()
         
         if len(df_scatter) > 0:
             fig_scatter = px.scatter(
                 df_scatter,
                 x='precio_numerico',
-                y='cantidad_vendidos',
+                y='cantidad_vendidos_num',
                 color='categoria_precio',
                 size='calificacion',
                 hover_data=['titulo', 'marca'],
-                title='',
                 labels={
                     'precio_numerico': 'Precio ($)',
-                    'cantidad_vendidos': 'Cantidad Vendidos',
+                    'cantidad_vendidos_num': 'Cantidad Vendidos',
                     'categoria_precio': 'Categoría'
                 },
                 color_discrete_map={
@@ -266,27 +633,19 @@ def main():
                     'Caro': '#e74c3c'
                 }
             )
-            
-            fig_scatter.update_layout(
-                height=400,
-                xaxis_tickformat='$,.0f'
-            )
-            
+            fig_scatter.update_layout(height=400, xaxis_tickformat='$,.0f')
             st.plotly_chart(fig_scatter, use_container_width=True)
         else:
             st.info("No hay datos de ventas disponibles")
     
     with col_der:
-        # Gráfico de Barras: Precio Promedio por Calificación
         st.markdown("### ⭐ Precio Promedio por Calificación")
-        st.caption("Relación entre precio y satisfacción del cliente")
+        st.caption("Relación entre precio y satisfacción")
         
         df_calif = df_filtrado[df_filtrado['calificacion'] > 0].copy()
         
         if len(df_calif) > 0:
-            # Redondear calificaciones para agrupar
             df_calif['calificacion_redondeada'] = df_calif['calificacion'].round(1)
-            
             precio_por_calif = df_calif.groupby('calificacion_redondeada')['precio_numerico'].mean().reset_index()
             precio_por_calif = precio_por_calif.sort_values('calificacion_redondeada')
             
@@ -294,7 +653,6 @@ def main():
                 precio_por_calif,
                 x='calificacion_redondeada',
                 y='precio_numerico',
-                title='',
                 labels={
                     'calificacion_redondeada': 'Calificación',
                     'precio_numerico': 'Precio Promedio ($)'
@@ -302,20 +660,14 @@ def main():
                 color='precio_numerico',
                 color_continuous_scale='Blues'
             )
-            
-            fig_barras.update_layout(
-                height=400,
-                yaxis_tickformat='$,.0f',
-                showlegend=False
-            )
-            
+            fig_barras.update_layout(height=400, yaxis_tickformat='$,.0f', showlegend=False)
             st.plotly_chart(fig_barras, use_container_width=True)
         else:
             st.info("No hay datos de calificación disponibles")
     
     st.markdown("---")
     
-    # Gráfico de Torta: Marcas más populares
+    # Gráfico de Torta
     col_torta, col_espacio = st.columns([2, 1])
     
     with col_torta:
@@ -323,17 +675,13 @@ def main():
         st.caption("Distribución de productos por marca")
         
         marcas_count = df_filtrado['marca'].value_counts().head(10)
-        
         fig_torta = px.pie(
             values=marcas_count.values,
             names=marcas_count.index,
-            title='',
-            hole=0.4  # Dona
+            hole=0.4
         )
-        
         fig_torta.update_layout(height=500)
         fig_torta.update_traces(textposition='inside', textinfo='percent+label')
-        
         st.plotly_chart(fig_torta, use_container_width=True)
     
     st.markdown("---")
@@ -342,40 +690,188 @@ def main():
     st.markdown("### 📋 Tabla de Productos")
     st.caption(f"Total: {len(df_filtrado)} productos")
     
-    # Seleccionar columnas a mostrar
-    columnas_mostrar = [
-        'titulo', 'marca', 'precio_actual', 'categoria_precio',
-        'calificacion', 'vendidos', 'envio_gratis_texto', 'descuento'
-    ]
+    # Columnas a mostrar (ahora incluye 'link')
+    columnas_base = ['titulo', 'marca', 'precio_actual', 'categoria_precio',
+                     'calificacion', 'vendidos', 'envio_gratis_texto', 'descuento_mostrar', 'link']
     
-    df_mostrar = df_filtrado[columnas_mostrar].copy()
-    df_mostrar.columns = [
-        'Título', 'Marca', 'Precio', 'Categoría',
-        'Calificación', 'Vendidos', 'Envío Gratis', 'Descuento'
-    ]
+    if 'resumen_ia' in df_filtrado.columns:
+        columnas_base.insert(4, 'resumen_ia')
     
-    # Configurar display
+    df_mostrar = df_filtrado[columnas_base].copy()
+    
+    # Renombrar columnas
+    nombres_columnas = {
+        'titulo': 'Título',
+        'marca': 'Marca',
+        'precio_actual': 'Precio',
+        'categoria_precio': 'Categoría',
+        'calificacion': 'Calificación',
+        'vendidos': 'Vendidos',
+        'envio_gratis_texto': 'Envío Gratis',
+        'descuento_mostrar': 'Descuento',
+        'link': 'Link'
+    }
+    
+    if 'resumen_ia' in df_mostrar.columns:
+        nombres_columnas['resumen_ia'] = 'Resumen IA'
+    
+    df_mostrar = df_mostrar.rename(columns=nombres_columnas)
+    
+    # Convertir columnas a tipos numéricos para filtrado dinámico
+    # Columna Precio: Extraer valor numérico
+    df_mostrar['Precio_num'] = df_filtrado['precio_numerico'].values
+    
+    # Columna Descuento: Extraer valor numérico entero
+    df_mostrar['Descuento_num'] = df_filtrado['descuento_num'].values.astype(int)
+    
+    # Configurar columna config para sort, tipos y link clickeable
+    column_config = {
+        "Precio": st.column_config.NumberColumn(
+            "Precio",
+            help="Precio actual del producto",
+            format="$%.0f"
+        ),
+        "Precio_num": st.column_config.NumberColumn(
+            "Precio (num)",
+            help="Precio numérico para filtrado",
+            format="$%.2f"
+        ),
+        "Vendidos": st.column_config.TextColumn(
+            "Vendidos",
+            help="Cantidad de productos vendidos"
+        ),
+        "Descuento": st.column_config.TextColumn(
+            "Descuento",
+            help="Porcentaje de descuento"
+        ),
+        "Descuento_num": st.column_config.NumberColumn(
+            "Descuento (%)",
+            help="Descuento numérico para filtrado",
+            format="%d%%"
+        ),
+        "Link": st.column_config.LinkColumn(
+            "Link",
+            help="Link al producto en Mercado Libre",
+            display_text="Ver Producto 🔗"
+        ),
+        "Resumen IA": st.column_config.TextColumn(
+            "Resumen IA",
+            help="Resumen generado por IA de Mercado Libre",
+            width="large"
+        ),
+    }
+    
+    # Mostrar tabla
     st.dataframe(
         df_mostrar,
         use_container_width=True,
-        height=400
+        height=400,
+        column_config=column_config
     )
     
-    # Botón de descarga
-    csv = df_filtrado.to_csv(index=False).encode('utf-8')
+    # Botón de descarga XLSX
+    excel_file = crear_excel_descargable(df_mostrar)
+    
     st.download_button(
-        label="⬇️ Descargar datos filtrados (CSV)",
-        data=csv,
-        file_name=f"productos_filtrados_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-        mime="text/csv"
+        label="⬇️ Descargar datos filtrados (Excel)",
+        data=excel_file,
+        file_name=f"productos_filtrados_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+    
+    # CHATBOT IA - Widget Flotante (al final de la página)
+    st.markdown("---")
+    st.markdown("## 🤖 Asistente IA - Data Analyst")
+    
+    # Inicializar estado del chat
+    if "chat_abierto" not in st.session_state:
+        st.session_state.chat_abierto = False
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    if llm_config_ok and llm_provider:
+        # Toggle para abrir/cerrar chat
+        col_chat1, col_chat2 = st.columns([3, 1])
+        with col_chat1:
+            st.markdown("**Pregunta al asistente sobre productos, precios, opiniones y estrategias de mercado**")
+        with col_chat2:
+            chat_expandido = st.checkbox("Abrir Chat", value=st.session_state.chat_abierto, key="toggle_chat")
+            st.session_state.chat_abierto = chat_expandido
+        
+        if chat_expandido:
+            # Prompts sugeridos en columnas
+            st.markdown("##### 💬 Prompts Sugeridos:")
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                if st.button("💡 Avatar de Cliente", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Analiza todas las opiniones para crear un avatar de cliente ideal con características demográficas, psicográficas y necesidades específicas"
+            
+            with col2:
+                if st.button("💰 Estrategia de Precio", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Sugerime una estrategia para encontrar el mejor precio de venta del producto analizado basado en la competencia y la percepción de valor"
+            
+            with col3:
+                if st.button("📊 Explica Insights", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Explícame los insights más importantes de estos datos desde una perspectiva de marketing y ventas"
+            
+            with col4:
+                if st.button("⭐ Análisis Opiniones", use_container_width=True):
+                    st.session_state.prompt_sugerido = "Resume los puntos principales de las opiniones de clientes, tanto positivos como negativos"
+            
+            st.markdown("---")
+            
+            # Historial de mensajes (scrollable)
+            chat_container = st.container(height=400)
+            with chat_container:
+                if len(st.session_state.messages) == 0:
+                    st.info("👋 ¡Hola! Soy tu asistente de análisis de datos. Pregúntame lo que quieras sobre los productos.")
+                
+                for message in st.session_state.messages:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
+            
+            # Input de chat
+            if "prompt_sugerido" in st.session_state:
+                prompt = st.session_state.prompt_sugerido
+                del st.session_state.prompt_sugerido
+            else:
+                prompt = st.chat_input("Escribe tu pregunta aquí...", key="chat_input_widget")
+            
+            # Procesar nuevo mensaje
+            if prompt:
+                # Agregar mensaje del usuario
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                
+                # Generar respuesta con spinner
+                with st.spinner("🧠 Analizando datos..."):
+                    response = analizar_con_ia(
+                        prompt, 
+                        df_filtrado, 
+                        llm_provider,
+                        json_productos_completo,
+                        json_analisis_completo
+                    )
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                
+                # Rerun para mostrar los nuevos mensajes
+                st.rerun()
+            
+            # Botón para limpiar historial
+            if len(st.session_state.messages) > 0:
+                if st.button("🗑️ Limpiar Chat"):
+                    st.session_state.messages = []
+                    st.rerun()
+    else:
+        st.warning("⚠️ Chatbot IA no disponible")
+        st.info("Configura `GROQ_API_KEY` para usar el asistente de IA. Obtén tu API key en: https://console.groq.com/")
     
     # Footer
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #666; padding: 2rem;'>
-        <p>Dashboard creado con ❤️ usando Streamlit</p>
-        <p>Datos extraídos de Mercado Libre Argentina 🇦🇷</p>
+        <p>Powered by Tomas Cabrera - Apertura IA</p>
+        <p>Datos de Mercado Libre Argentina 🇦🇷</p>
     </div>
     """, unsafe_allow_html=True)
 

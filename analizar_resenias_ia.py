@@ -15,6 +15,7 @@ import json
 import time
 import sys
 import io
+import os
 from datetime import datetime
 
 # Configurar encoding UTF-8 para Windows
@@ -220,10 +221,16 @@ def mostrar_resumen_analisis(resultados, producto_buscado):
 
 
 def guardar_resultados(resultados, producto_buscado):
-    """Guarda los resultados en un archivo JSON"""
+    """Guarda los resultados en un archivo JSON en la carpeta resenias/"""
+    # Crear carpeta resenias/ si no existe
+    carpeta_resenias = "resenias"
+    if not os.path.exists(carpeta_resenias):
+        os.makedirs(carpeta_resenias)
+        print(f"📁 Carpeta '{carpeta_resenias}/' creada")
+    
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     nombre_archivo = f"analisis_resenias_{producto_buscado.replace(' ', '_')}_{timestamp}.json"
-    #nombre_archivo = "productos_heladeras_20251105_230546.json"
+    ruta_completa = os.path.join(carpeta_resenias, nombre_archivo)
     
     datos_salida = {
         'producto_analizado': producto_buscado,
@@ -233,11 +240,11 @@ def guardar_resultados(resultados, producto_buscado):
         'productos': resultados
     }
     
-    with open(nombre_archivo, 'w', encoding='utf-8') as f:
+    with open(ruta_completa, 'w', encoding='utf-8') as f:
         json.dump(datos_salida, f, ensure_ascii=False, indent=2)
     
-    print(f"💾 Resultados guardados en: {nombre_archivo}")
-    return nombre_archivo
+    print(f"💾 Resultados guardados en: {ruta_completa}")
+    return ruta_completa
 
 
 if __name__ == "__main__":
