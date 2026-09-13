@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Crear carpetas para datos si no existen
-RUN mkdir -p productos resenias
+RUN mkdir -p data/productos data/resenias
 
 # Exponer puerto de Streamlit
 EXPOSE 8501
@@ -31,4 +31,4 @@ ENV STREAMLIT_SERVER_HEADLESS=true
 ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
 # Comando por defecto: ejecutar dashboard
-CMD ["streamlit", "run", "dashboard_productos_v4.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "src/dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]

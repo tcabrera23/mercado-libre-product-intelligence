@@ -2,9 +2,6 @@
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 
-# Para Selenium (análisis de reseñas v2)
-selenium>=4.15.0
-
 # Para Export a Excel
 pandas>=2.1.0
 openpyxl>=3.1.2
@@ -13,9 +10,12 @@ openpyxl>=3.1.2
 streamlit>=1.28.0
 plotly>=5.17.0
 
-# Para Chatbot IA (v4.0) - Groq opcional
+# Para Chatbot IA - Groq opcional
 groq>=0.4.0
 
 # Para variables de entorno
 python-dotenv>=1.0.0
+
+# Para tests
+pytest>=7.4.0
 

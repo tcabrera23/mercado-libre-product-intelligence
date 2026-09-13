@@ -28,14 +28,14 @@ env/
 .DS_Store
 Thumbs.db
 
-# Docs y backups
-backup/
-documentacion/
+# Docs y tests (no se necesitan para correr la app)
+docs/
 tests/
 *.md
 !README.md
-!DOCKER_SETUP.md
 
-# Datos de ejemplo (opcional, descomentar si quieres incluirlos)
-# productos/*.json
-# resenias/*.json
+# Datos generados (se montan como volumen o se crean en runtime)
+data/productos/*
+data/resenias/*
+!data/productos/.gitkeep
+!data/resenias/.gitkeep

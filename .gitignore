@@ -42,11 +42,10 @@ pip-wheel-metadata/
 .streamlit/
 
 # Archivos de datos generados por el proyecto
-productos/
-resenias/
+data/productos/*
+data/resenias/*
+!data/productos/.gitkeep
+!data/resenias/.gitkeep
 
 # Archivos de test (caches, logs, etc.)
 .pytest_cache/
-
-# Documentación o archivos de troubleshooting específicos que no son parte del core del repo
-FIX_PLOTLY_ERROR.md
