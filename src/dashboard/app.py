@@ -9,9 +9,16 @@ import plotly.express as px
 import plotly.graph_objects as go
 import json
 import os
+import sys
+from pathlib import Path
 from datetime import datetime
 import io
-from llm_config import get_llm_provider, list_ollama_models
+
+# Permitir ejecutar con `streamlit run src/dashboard/app.py` agregando la raíz
+# del repo a sys.path para que funcionen los imports absolutos de src.*
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from src.llm.config import get_llm_provider, list_ollama_models
 from dotenv import load_dotenv
 
 # Cargar variables de entorno desde .env
@@ -158,9 +165,9 @@ def clasificar_precio(precio, promedio):
 @st.cache_data
 def cargar_datos(archivo_json_productos, archivo_json_analisis=None):
     """Carga y procesa los datos del JSON, con join opcional de análisis"""
-    # Añadir carpeta productos/ si no tiene ruta
+    # Añadir carpeta data/productos/ si no tiene ruta
     if not os.path.dirname(archivo_json_productos):
-        archivo_json_productos = os.path.join("productos", archivo_json_productos)
+        archivo_json_productos = os.path.join("data", "productos", archivo_json_productos)
     
     # Cargar productos
     with open(archivo_json_productos, 'r', encoding='utf-8') as f:
@@ -188,9 +195,9 @@ def cargar_datos(archivo_json_productos, archivo_json_analisis=None):
     # JOIN con análisis de reseñas si existe
     data_analisis_completo = None
     if archivo_json_analisis:
-        # Añadir carpeta resenias/ si no tiene ruta
+        # Añadir carpeta data/resenias/ si no tiene ruta
         if not os.path.dirname(archivo_json_analisis):
-            archivo_json_analisis = os.path.join("resenias", archivo_json_analisis)
+            archivo_json_analisis = os.path.join("data", "resenias", archivo_json_analisis)
         
         if os.path.exists(archivo_json_analisis):
             try:
@@ -250,20 +257,20 @@ def crear_excel_descargable(df_mostrar):
 
 
 def ejecutar_scraping_producto(producto_nombre):
-    """Ejecuta el scraping de productos usando buscar_productos_ml.py"""
+    """Ejecuta el scraping de productos usando src/scraping/buscador_productos.py"""
     import subprocess
     try:
         # Ejecutar script de búsqueda de productos
         result = subprocess.run(
-            ['python', 'buscar_productos_ml.py', producto_nombre],
+            [sys.executable, 'src/scraping/buscador_productos.py', producto_nombre],
             capture_output=True,
             text=True,
             timeout=120  # 2 minutos timeout
         )
-        
+
         if result.returncode == 0:
-            # Buscar el archivo JSON generado más reciente en carpeta productos/
-            carpeta_productos = "productos"
+            # Buscar el archivo JSON generado más reciente en carpeta data/productos/
+            carpeta_productos = os.path.join("data", "productos")
             if os.path.exists(carpeta_productos):
                 archivos = [f for f in os.listdir(carpeta_productos) if f.startswith('productos_') and producto_nombre.replace(' ', '_') in f and f.endswith('.json')]
                 if archivos:
@@ -279,20 +286,20 @@ def ejecutar_scraping_producto(producto_nombre):
 
 
 def ejecutar_analisis_resenias(archivo_productos):
-    """Ejecuta el análisis de reseñas usando analizar_resenias_ia.py"""
+    """Ejecuta el análisis de reseñas usando src/analisis/analizador_resenias.py"""
     import subprocess
     try:
         # Ejecutar script de análisis de reseñas (versión simplificada - solo resumen IA)
         result = subprocess.run(
-            ['python', 'analizar_resenias_ia.py', archivo_productos],
+            [sys.executable, 'src/analisis/analizador_resenias.py', archivo_productos],
             capture_output=True,
             text=True,
             timeout=300  # 5 minutos timeout (más rápido ahora sin opiniones individuales)
         )
-        
+
         if result.returncode == 0:
-            # Buscar el archivo JSON de análisis generado más reciente en carpeta resenias/
-            carpeta_resenias = "resenias"
+            # Buscar el archivo JSON de análisis generado más reciente en carpeta data/resenias/
+            carpeta_resenias = os.path.join("data", "resenias")
             if os.path.exists(carpeta_resenias):
                 archivos = [f for f in os.listdir(carpeta_resenias) if f.startswith('analisis_resenias_') and f.endswith('.json')]
                 if archivos:
@@ -484,21 +491,21 @@ def main():
     
     st.sidebar.markdown("---")
     
-    # Listar archivos JSON disponibles en carpetas productos/ y resenias/
-    carpeta_productos = "productos"
-    carpeta_resenias = "resenias"
-    
-    # Verificar que exista la carpeta productos
+    # Listar archivos JSON disponibles en carpetas data/productos/ y data/resenias/
+    carpeta_productos = os.path.join("data", "productos")
+    carpeta_resenias = os.path.join("data", "resenias")
+
+    # Verificar que exista la carpeta de productos
     if not os.path.exists(carpeta_productos):
-        st.error("❌ No se encontró la carpeta 'productos/'")
-        st.info("💡 Ejecuta: `python buscar_productos_ml.py 'producto'`")
+        st.error("❌ No se encontró la carpeta 'data/productos/'")
+        st.info("💡 Ejecuta: `python src/scraping/buscador_productos.py 'producto'`")
         return
-    
+
     archivos_productos = [f for f in os.listdir(carpeta_productos) if f.startswith('productos_') and f.endswith('.json')]
-    
+
     if not archivos_productos:
-        st.error("❌ No se encontraron archivos JSON de productos en 'productos/'")
-        st.info("💡 Ejecuta: `python buscar_productos_ml.py 'producto'`")
+        st.error("❌ No se encontraron archivos JSON de productos en 'data/productos/'")
+        st.info("💡 Ejecuta: `python src/scraping/buscador_productos.py 'producto'`")
         return
     
     archivo_productos = st.sidebar.selectbox(

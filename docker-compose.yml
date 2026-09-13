@@ -29,8 +29,8 @@ services:
       - "8501:8501"
     volumes:
       # Montar carpetas de datos para persistencia
-      - ./productos:/app/productos
-      - ./resenias:/app/resenias
+      - ./data/productos:/app/data/productos
+      - ./data/resenias:/app/data/resenias
       # Montar código para desarrollo (opcional, comentar en producción)
       - .:/app
     environment:

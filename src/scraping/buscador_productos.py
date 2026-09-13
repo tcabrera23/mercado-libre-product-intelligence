@@ -12,6 +12,11 @@ from datetime import datetime
 import sys
 import io
 import os
+from pathlib import Path
+
+# Permitir ejecutar este script directamente (python src/scraping/buscador_productos.py)
+# agregando la raíz del repo a sys.path para que funcionen los imports absolutos.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 # Configurar encoding UTF-8 para Windows
 if sys.platform == 'win32':
@@ -24,7 +29,7 @@ if sys.platform == 'win32':
         pass  # Si falla, continuar sin emojis
 
 # Importar la función para obtener HTML de Mercado Libre
-from parse_html.get_html import obtener_html_mercadolibre
+from src.scraping.html_ml import obtener_html_mercadolibre
 
 
 def extraer_productos_con_id(html_section):
@@ -150,7 +155,7 @@ def extraer_productos_con_id(html_section):
 
 def guardar_productos(productos, nombre_producto):
     """
-    Guarda los productos en un archivo JSON en la carpeta productos/
+    Guarda los productos en un archivo JSON en la carpeta data/productos/
     
     Args:
         productos: Lista de productos
@@ -160,8 +165,8 @@ def guardar_productos(productos, nombre_producto):
         print("❌ No hay productos para guardar")
         return None
     
-    # Crear carpeta productos/ si no existe
-    carpeta_productos = "productos"
+    # Crear carpeta data/productos/ si no existe
+    carpeta_productos = os.path.join("data", "productos")
     if not os.path.exists(carpeta_productos):
         os.makedirs(carpeta_productos)
         print(f"📁 Carpeta '{carpeta_productos}/' creada")

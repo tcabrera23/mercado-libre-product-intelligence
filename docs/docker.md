@@ -17,10 +17,10 @@ Esta opción levanta automáticamente:
 
 ```bash
 # 1. Clonar o descargar el proyecto
-cd "Analisis de Productos"
+cd mercado-libre-product-intelligence
 
 # 2. (Opcional) Configurar variables de entorno
-cp .env.example .env
+cp env.example .env
 # Edita .env si quieres usar Groq además de Ollama
 
 # 3. Levantar los servicios
@@ -45,8 +45,8 @@ docker build -t analisis-productos .
 docker run -d \
   -p 8501:8501 \
   -e GROQ_API_KEY=tu_api_key \
-  -v $(pwd)/productos:/app/productos \
-  -v $(pwd)/resenias:/app/resenias \
+  -v $(pwd)/data/productos:/app/data/productos \
+  -v $(pwd)/data/resenias:/app/data/resenias \
   --name analisis-productos \
   analisis-productos
 
@@ -111,20 +111,22 @@ docker-compose up -d
 ## 📦 Estructura de Carpetas
 
 ```
-Analisis de Productos/
-├── productos/           # JSONs de productos (persistentes)
-├── resenias/            # JSONs de reseñas (persistentes)
-├── dashboard_productos_v4.py
-├── buscar_productos_ml.py
-├── analizar_resenias_ia.py
-├── llm_config.py        # Módulo de configuración LLM
+mercado-libre-product-intelligence/
+├── data/
+│   ├── productos/        # JSONs de productos (persistentes)
+│   └── resenias/         # JSONs de reseñas (persistentes)
+├── src/
+│   ├── dashboard/app.py
+│   ├── scraping/buscador_productos.py
+│   ├── analisis/analizador_resenias.py
+│   └── llm/config.py     # Módulo de configuración LLM
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
-└── .env.example
+└── env.example
 ```
 
-Los datos en `productos/` y `resenias/` se mantienen aunque elimines los contenedores.
+Los datos en `data/productos/` y `data/resenias/` se mantienen aunque elimines los contenedores.
 
 ## 🔧 Comandos Útiles
 
@@ -245,7 +247,7 @@ docker-compose up -d
 ## 📝 Notas
 
 - Los modelos de Ollama se descargan la primera vez (pueden ser varios GB)
-- Los datos en `productos/` y `resenias/` persisten entre reinicios
+- Los datos en `data/productos/` y `data/resenias/` persisten entre reinicios
 - Puedes usar Groq + Ollama simultáneamente, cambiando en el dashboard
 - Para mejor rendimiento con Ollama, considera usar GPU (requiere NVIDIA Docker)
 

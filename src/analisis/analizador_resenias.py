@@ -2,7 +2,7 @@
 Script para analizar reseñas de productos de Mercado Libre (VERSIÓN SIMPLIFICADA)
 
 Este script:
-1. Lee los JSON de productos generados por buscar_productos_ml.py
+1. Lee los JSON de productos generados por src/scraping/buscador_productos.py
 2. Extrae solo el "Resumen de opiniones generado por IA" de cada producto
 3. Genera un JSON con los resultados
 
@@ -221,9 +221,9 @@ def mostrar_resumen_analisis(resultados, producto_buscado):
 
 
 def guardar_resultados(resultados, producto_buscado):
-    """Guarda los resultados en un archivo JSON en la carpeta resenias/"""
-    # Crear carpeta resenias/ si no existe
-    carpeta_resenias = "resenias"
+    """Guarda los resultados en un archivo JSON en la carpeta data/resenias/"""
+    # Crear carpeta data/resenias/ si no existe
+    carpeta_resenias = os.path.join("data", "resenias")
     if not os.path.exists(carpeta_resenias):
         os.makedirs(carpeta_resenias)
         print(f"📁 Carpeta '{carpeta_resenias}/' creada")
@@ -257,10 +257,10 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("❌ Error: Debes especificar un archivo JSON de productos")
         print("\n❓ Uso:")
-        print("  python analizar_resenias_ia.py <archivo_productos.json> [cantidad_opcional]")
+        print("  python src/analisis/analizador_resenias.py <archivo_productos.json> [cantidad_opcional]")
         print("\n📝 Ejemplos:")
-        print("  python analizar_resenias_ia.py productos_auriculares_20241104.json")
-        print("  python analizar_resenias_ia.py productos_auriculares_20241104.json 10")
+        print("  python src/analisis/analizador_resenias.py data/productos/productos_auriculares_20241104.json")
+        print("  python src/analisis/analizador_resenias.py data/productos/productos_auriculares_20241104.json 10")
         sys.exit(1)
     
     ARCHIVO_PRODUCTOS = sys.argv[1]
