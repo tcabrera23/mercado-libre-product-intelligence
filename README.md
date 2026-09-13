@@ -9,6 +9,45 @@ Sistema para extraer, analizar y visualizar información de productos de Mercado
 - 📊 **Export a Excel**: convierte los JSON de productos en un `.xlsx` con clasificación de precios y marcas.
 - 📈 **Dashboard interactivo**: filtros dinámicos, gráficos (precio vs ventas, marcas, calificación) y un chatbot IA con acceso a los datos cargados.
 
+## 🔄 Flujo de la app
+
+Los componentes se comunican a través de archivos JSON en `data/`, no por llamadas directas: cada script se puede correr solo o ser disparado por el dashboard.
+
+```mermaid
+flowchart TD
+    U(["👤 Usuario"]) -->|terminal o sidebar| BUSCAR
+    U -->|abre el navegador| APP
+
+    subgraph SCRAPE["🔍 1. Extracción de productos"]
+        BUSCAR["src/scraping/buscador_productos.py"] --> HTML["src/scraping/html_ml.py"]
+        HTML -->|requests + BeautifulSoup| ML1(["Mercado Libre<br/>resultados de búsqueda"])
+        BUSCAR -->|guarda| PJSON[("data/productos/<br/>productos_*.json")]
+    end
+
+    subgraph ANALISIS["🤖 2. Análisis de reseñas (opcional)"]
+        PJSON --> ANALIZAR["src/analisis/analizador_resenias.py"]
+        ANALIZAR -->|visita cada link de producto| ML2(["Mercado Libre<br/>página de producto"])
+        ANALIZAR -->|guarda| AJSON[("data/resenias/<br/>analisis_resenias_*.json")]
+    end
+
+    subgraph DASH["📊 3. Dashboard interactivo"]
+        APP["src/dashboard/app.py"]
+        PJSON -->|carga| APP
+        AJSON -.->|join por id, si existe| APP
+        APP --> UI["Filtros, gráficos y tabla"]
+        APP --> EXCEL["src/exportacion/excel_exporter.py<br/>descarga .xlsx"]
+        APP --> CHAT["Chatbot IA"]
+        CHAT --> LLMCFG["src/llm/config.py"]
+        LLMCFG --> GROQ(["Groq API"])
+        LLMCFG --> OLLAMA(["Ollama local"])
+    end
+
+    APP -.->|botón Buscar del sidebar dispara subprocess| BUSCAR
+    APP -.->|checkbox Incluir reseñas dispara subprocess| ANALIZAR
+```
+
+Flechas sólidas: flujo normal de datos. Flechas punteadas: la búsqueda en tiempo real del dashboard dispara los scripts de scraping/análisis como subprocess.
+
 ## 🚀 Inicio rápido
 
 ### Con Docker (recomendado)
